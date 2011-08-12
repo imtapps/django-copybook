@@ -5,21 +5,19 @@ REQUIREMENTS = [
 ]
 
 setup(
-    name="new_app",
+    name="django-copybook",
     version='0.0.1',
-    author="Author Name",
-    author_email="author_email",
-    description="Description for new_app.",
+    author="Matthew J. Morrison",
+    author_email="mattj.morrison@gmail.com",
+    description="Convert Django models to/from fixed format records.",
     long_description=open('README.txt', 'r').read(),
-    url="http://www.example.com",
-    packages=("new_app",),
+    packages=("copybook",),
     install_requires=REQUIREMENTS,
     tests_require=REQUIREMENTS,
     test_suite='runtests.runtests',
     zip_safe=False,
     classifiers = [
         "Development Status :: 3 - Alpha",
-        "Environment :: Web Environment",
         "Framework :: Django",
         "Intended Audience :: Developers",
         "License :: OSI Approved :: BSD License",
