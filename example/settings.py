@@ -16,5 +16,5 @@ DATABASES = {
 
 INSTALLED_APPS = (
     'sample',
-    'copybook',
+    'djcopybook',
 )
