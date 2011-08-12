@@ -2,7 +2,7 @@
 import datetime
 from django import test
 from django.utils.unittest import TestCase
-from copybook import models, fields
+from djcopybook import models, fields
 from sample import models as sample_models
 from sample import copybooks
 
@@ -232,7 +232,7 @@ class ListFieldTests(test.TestCase):
         self.assertEqual(model.twelfth_set.all()[4].fourth_field, 'aaa')
 
     def test_populate_related_models(self):
-        model = models.PopulateModel(None).populate_related_models(sample_models.First(first_field='abc', second_field='xyz'), 
+        model = models.PopulateModel(None).populate_related_models(sample_models.First(first_field='abc', second_field='xyz'),
             'twelfth_set', [
                 {'fourth_field':'xxx'},
                 {'fourth_field':'yyy'},

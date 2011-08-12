@@ -6,12 +6,12 @@ REQUIREMENTS = [
 
 setup(
     name="django-copybook",
-    version='0.0.1',
+    version='0.0.2',
     author="Matthew J. Morrison",
     author_email="mattj.morrison@gmail.com",
     description="Convert Django models to/from fixed format records.",
     long_description=open('README.txt', 'r').read(),
-    packages=("copybook",),
+    packages=("djcopybook",),
     install_requires=REQUIREMENTS,
     tests_require=REQUIREMENTS,
     test_suite='runtests.runtests',
