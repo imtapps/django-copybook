@@ -6,7 +6,7 @@ REQUIREMENTS = [
 
 setup(
     name="django-copybook",
-    version='0.0.3',
+    version='0.0.4',
     author="Matthew J. Morrison",
     author_email="mattj.morrison@gmail.com",
     description="Convert Django models to/from fixed format records.",

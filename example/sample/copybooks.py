@@ -1,4 +1,4 @@
-from copybook import models, fields
+from djcopybook import models, fields
 
 __all__ = (
     "TestCopybook", "FirstCopybook", "SecondCopybook",
