@@ -6,6 +6,7 @@ __all__ = (
     'IntegerField',
     'DateField',
     'DecimalField',
+    'ListField',
 )
 
 class NOT_PROVIDED(object):
@@ -52,7 +53,7 @@ class FixedWidthField(object):
         setattr(instance, self._get_instance_field(), self.to_python(val))
 
     def _get_instance_field(self):
-        return "%s_%s" % (self.attname, self.creation_counter)
+        return "{attname}_{creation_counter}".format(**self.__dict__)
 
     def has_default(self):
         return self.default is not NOT_PROVIDED
@@ -72,13 +73,16 @@ class FixedWidthField(object):
         if val is None:
             val = ''
         return str_padding(self.length, val)
-    
+
     def get_record_value(self, val):
         record_val = self.to_record(val)
+        self._check_record_length(record_val)
+        return record_val
+
+    def _check_record_length(self, record_val):
         if len(record_val) > self.length:
             err = "'{attname}' value '{}' is longer than {length} chars.".format(record_val, **self.__dict__)
             raise FieldLengthError(err)
-        return record_val
 
 class StringField(FixedWidthField):
     pass
@@ -132,4 +136,48 @@ class DateField(FixedWidthField):
             return str_padding(self.length, '')
         return val.strftime(self.format)
 
-#Todo: fields needed: ListField
+class ListField(FixedWidthField):
+    """
+    ListField allows you to have a field made up of a number of
+    other records. Similar to COBOL's OCCURS.
+
+    parameters:
+      - record: which Record the field is made up of
+      - length: how many times that record occurs
+
+    """
+
+    def __init__(self, record, length=1):
+        self.record_class = record
+        super(ListField, self).__init__(length)
+
+    def to_python(self, val):
+        """
+        the python representation should be a list of instantiated
+        Record classes.
+        """
+        if not all([isinstance(r, self.record_class) for r in val]):
+            msg = "List field must contain instances of '{}'.".format(self.record_class.__name__)
+            raise TypeError(msg)
+        return list(val)
+
+    def get_default(self):
+        return []
+
+    def to_record(self, val):
+        """
+        We receive a list of Record classes and must make sure
+        we have a complete record we're giving back.
+        """
+        while len(val) < self.length:
+            val.append(self.record_class())
+        return ''.join([v.to_record() for v in val])
+
+    def _check_record_length(self, record_val):
+        max_record_length = len(self.record_class)
+        record_length = len(record_val)
+        if record_length > (self.length * max_record_length):
+            record_count = record_length / max_record_length
+            msg = "'{attname}' contains {cnt} records but can only have {length}.".format(cnt=record_count,
+                                                                                          **self.__dict__)
+            raise FieldLengthError(msg)

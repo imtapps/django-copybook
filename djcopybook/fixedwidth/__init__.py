@@ -45,6 +45,9 @@ class DeclarativeFieldsMetaclass(type):
 
         return new_class
 
+    def __len__(cls):
+        return sum(f.length for f in cls.base_fields.values())
+
 class BaseRecord(object):
 
     # This is the main implementation of all the record logic. Note that this
@@ -77,7 +80,14 @@ class BaseRecord(object):
             setattr(self, field.attname, val)
 
         if kwargs:
-            raise TypeError("'%s' is an invalid keyword argument for this function" % kwargs.keys()[0])
+            raise TypeError("'{}' is an invalid keyword argument for this function".format(kwargs.keys()[0]))
+
+    def __len__(self):
+        "total fixed width length"
+        return sum(f.length for f in self.fields.values())
+
+    def __str__(self):
+        return self.to_record()
 
     def get_record_value(self, fieldname):
         """
