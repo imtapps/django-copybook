@@ -17,7 +17,7 @@ def runtests(*test_args, **kwargs):
         patch_for_test_db_setup()
 
     if not test_args:
-        test_args = ['sample']
+        test_args = ['sample', 'djcopybook']
 
     failures = run_tests(test_args, verbosity=kwargs.get('verbosity', 1), interactive=kwargs.get('interactive', False), failfast=kwargs.get('failfast'))
     sys.exit(failures)

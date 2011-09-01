@@ -1,4 +1,4 @@
-from setuptools import setup
+from setuptools import setup, find_packages
 
 REQUIREMENTS = [
     'django',
@@ -6,24 +6,28 @@ REQUIREMENTS = [
 
 setup(
     name="django-copybook",
-    version='0.0.4',
+    version='0.1.0',
     author="Matthew J. Morrison",
     author_email="mattj.morrison@gmail.com",
-    description="Convert Django models to/from fixed format records.",
+    description="Convert Objects and Django models to/from fixed format records.",
     long_description=open('README.txt', 'r').read(),
-    packages=("djcopybook",),
+    packages=find_packages(exclude=["example"],),
     install_requires=REQUIREMENTS,
     tests_require=REQUIREMENTS,
     test_suite='runtests.runtests',
     zip_safe=False,
     classifiers = [
-        "Development Status :: 3 - Alpha",
+        "Development Status :: 4 - Beta",
         "Framework :: Django",
         "Intended Audience :: Developers",
         "License :: OSI Approved :: BSD License",
         "Operating System :: OS Independent",
         "Programming Language :: Python",
+        "Programming Language :: Python :: 2.7",
         "Topic :: Software Development",
         "Topic :: Software Development :: Libraries :: Application Frameworks",
+        "Topic :: Software Development :: Libraries :: Python Modules",
+        "Topic :: Text Processing",
+        "Topic :: Utilities",
     ],
 )
