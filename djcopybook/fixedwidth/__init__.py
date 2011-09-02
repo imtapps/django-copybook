@@ -9,7 +9,7 @@ a necessity for a properly formatted fixed-width record.
 from collections import OrderedDict
 from copy import deepcopy
 
-from djcopybook.fixedwidth.fields import FixedWidthField
+from djcopybook.fixedwidth import fields
 
 __all__ = ('Record',)
 
@@ -18,16 +18,16 @@ def get_declared_fields(bases, attrs):
     Create a list of fixedwidth field instances from the passed in 'attrs', plus any
     similar fields on the base classes (in 'bases').
     """
-    fields = [(field_name, obj) for field_name, obj in attrs.items() if isinstance(obj, FixedWidthField)]
-    fields.sort(key=lambda x: x[1].creation_counter)
+    fw_fields = [(field_name, obj) for field_name, obj in attrs.items() if isinstance(obj, fields.FixedWidthField)]
+    fw_fields.sort(key=lambda x: x[1].creation_counter)
 
     # If this class is subclassing another Record, add that Record's fields.
     # Note that we loop over the bases in *reverse*. This is necessary in
     # order to preserve the correct order of fields.
     for base in bases[::-1]:
         if hasattr(base, 'base_fields'):
-            fields = base.base_fields.items() + fields
-    return OrderedDict(fields)
+            fw_fields = base.base_fields.items() + fw_fields
+    return OrderedDict(fw_fields)
 
 class DeclarativeFieldsMetaclass(type):
     """
@@ -46,7 +46,10 @@ class DeclarativeFieldsMetaclass(type):
         return new_class
 
     def __len__(cls):
-        return sum(f.length for f in cls.base_fields.values())
+        """
+        Total length this record will be in a fixed width format.
+        """
+        return sum(get_field_length(f) for f in cls.base_fields.values())
 
 class BaseRecord(object):
 
@@ -83,8 +86,10 @@ class BaseRecord(object):
             raise TypeError("'{}' is an invalid keyword argument for this function".format(kwargs.keys()[0]))
 
     def __len__(self):
-        "total fixed width length"
-        return sum(f.length for f in self.fields.values())
+        """
+        Total length this record will be in a fixed width format.
+        """
+        return len(self.__class__)
 
     def __str__(self):
         return self.to_record()
@@ -102,6 +107,26 @@ class BaseRecord(object):
         """
         return ''.join(self.get_record_value(fn) for fn in self.fields)
 
+    @classmethod
+    def from_record(cls, record):
+        """
+        Takes an existing fixed width record and breaks it into it's
+        python Record object.
+        """
+        if len(record) != len(cls):
+            raise ValueError("Fixed width record length is {} but should be {}.".format(len(record), len(cls)))
+
+        new_record = cls()
+
+        pos = 0
+        for attrname, field_class in cls.base_fields.items():
+            field_length = get_field_length(field_class)
+            field_value = field_class.to_python(record[pos:pos + field_length])
+            setattr(new_record, attrname, field_value)
+
+            pos += field_length
+        return new_record
+
 class Record(BaseRecord):
     "A collection of FixedWidthFields, plus their associated data."
     # This is a separate class from BaseRecord in order to abstract the way
@@ -111,3 +136,12 @@ class Record(BaseRecord):
     # BaseCopybook itself has no way of designating self.fields.
     __metaclass__ = DeclarativeFieldsMetaclass
 
+def get_field_length(f):
+    """
+    Normally field length is the length attribute of a FixedWidthField
+    class. However, on ListField classes the length attribute represents
+    how many times the record is repeated, so we need the total.
+    """
+    if isinstance(f, fields.ListField):
+        return f.length * len(f.record_class)
+    return f.length

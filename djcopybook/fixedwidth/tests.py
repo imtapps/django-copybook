@@ -14,8 +14,6 @@ __all__ = (
     'DecimalFieldTests',
     'DateFieldTests',
     'ListFieldTests',
-
-
 )
 
 class RecordOne(fixedwidth.Record):
@@ -82,9 +80,65 @@ class RecordTests(TestCase):
         r = RecordOne()
         self.assertEqual(12, len(r))
 
+    def test_len_on_record_returns_total_amount_with_list_field(self):
+        class ListRecord(fixedwidth.Record):
+            field_one = fields.StringField(length=1)
+            field_two = fields.IntegerField(length=2)
+
+        class TestRecord(fixedwidth.Record):
+            name = fields.StringField(length=2)
+            list_field = fields.ListField(ListRecord, length=2)
+            end = fields.StringField(length=1)
+
+        # should get same len whether using instance or just the class
+        r = TestRecord()
+        self.assertEqual(9, len(r))
+        self.assertEqual(9, len(TestRecord))
+
     def test_str_on_record_returns_to_record_value(self):
         r = RecordOne(field_one="test", field_two=500)
         self.assertEqual("test 0000500", str(r))
+
+    def test_from_record_turns_fixed_width_string_to_record_object(self):
+        r = RecordOne.from_record("test 0000500")
+        self.assertEqual("test ", r.field_one)
+        self.assertEqual(500, r.field_two)
+
+    def test_from_record_turns_fixed_width_string_to_record_with_list_field(self):
+        class ListRecord(fixedwidth.Record):
+            field_one = fields.StringField(length=1)
+            field_two = fields.IntegerField(length=2)
+
+        class TestRecord(fixedwidth.Record):
+            name = fields.StringField(length=2)
+            list_field = fields.ListField(ListRecord, length=2)
+            end = fields.StringField(length=1)
+
+        r = TestRecord.from_record("XXA05B10Z")
+        self.assertEqual("XX", r.name)
+        self.assertEqual("Z", r.end)
+
+        list_field_one = r.list_field[0]
+        self.assertEqual("A", list_field_one.field_one)
+        self.assertEqual(5, list_field_one.field_two)
+
+        list_field_two = r.list_field[1]
+        self.assertEqual("B", list_field_two.field_one)
+        self.assertEqual(10, list_field_two.field_two)
+
+        self.assertEqual("XXA05B10Z", r.to_record())
+
+    def test_from_record_raises_value_error_when_fixed_width_string_less_than_record_length(self):
+        with self.assertRaises(ValueError) as e:
+            RecordOne.from_record("test 000050")
+        self.assertEqual("Fixed width record length is 11 but should be 12.", e.exception.message)
+
+    def test_from_record_raises_value_error_when_fixed_width_string_greater_than_record_length(self):
+        with self.assertRaises(ValueError) as e:
+            RecordOne.from_record("test 00005000")
+        self.assertEqual("Fixed width record length is 13 but should be 12.", e.exception.message)
+
+
 
 class FixedWidthFieldTests(TestCase):
 
@@ -264,6 +318,20 @@ class ListFieldTests(TestCase):
         self.assertEqual(records, python_val)
         self.assertIsInstance(python_val, list)
 
+    def test_to_python_returns_list_of_records_when_given_string(self):
+        f = fields.ListField(record=RecordOne, length=2)
+
+        records = f.to_python("ABCDE1111111ZYXWV9999999")
+        self.assertEqual(len(records), 2)
+
+        record_one = records[0]
+        self.assertEqual("ABCDE", record_one.field_one)
+        self.assertEqual(1111111, record_one.field_two)
+
+        record_two = records[1]
+        self.assertEqual("ZYXWV", record_two.field_one)
+        self.assertEqual(9999999, record_two.field_two)
+
     def test_to_python_raises_type_error_when_not_given_record_class_instances(self):
         f = fields.ListField(record=RecordOne, length=2)
         records = [RecordOne(), fixedwidth.Record()]
@@ -271,7 +339,7 @@ class ListFieldTests(TestCase):
         with self.assertRaises(TypeError) as e:
             f.to_python(records)
         self.assertEqual("List field must contain instances of 'RecordOne'.", e.exception.message)
-        
+
     def test_defaults_field_to_empty_list_when_no_records_initially_given(self):
         class TestRecord(fixedwidth.Record):
             field_one = fields.ListField(RecordOne, length=2)

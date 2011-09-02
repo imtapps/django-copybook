@@ -151,12 +151,24 @@ class ListField(FixedWidthField):
         self.record_class = record
         super(ListField, self).__init__(length)
 
+    def _get_records_from_string(self, val):
+        records = []
+        record_len = len(self.record_class)
+
+        pos = 0
+        while pos <= record_len:
+            records.append(self.record_class.from_record(val[pos:pos + record_len]))
+            pos += record_len
+        return records
+
     def to_python(self, val):
         """
         the python representation should be a list of instantiated
         Record classes.
         """
-        if not all([isinstance(r, self.record_class) for r in val]):
+        if isinstance(val, basestring):
+            return self._get_records_from_string(val)
+        elif not all([isinstance(r, self.record_class) for r in val]):
             msg = "List field must contain instances of '{}'.".format(self.record_class.__name__)
             raise TypeError(msg)
         return list(val)
