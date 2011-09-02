@@ -101,7 +101,7 @@ class RecordTests(TestCase):
 
     def test_from_record_turns_fixed_width_string_to_record_object(self):
         r = RecordOne.from_record("test 0000500")
-        self.assertEqual("test ", r.field_one)
+        self.assertEqual("test", r.field_one)
         self.assertEqual(500, r.field_two)
 
     def test_from_record_turns_fixed_width_string_to_record_with_list_field(self):
@@ -179,6 +179,10 @@ class FixedWidthFieldTests(TestCase):
         python_val = field.to_python(10)
         self.assertEqual("10", python_val)
         self.assertIsInstance(python_val, str)
+
+    def test_to_python_strips_extra_padding_from_right(self):
+        field = fields.FixedWidthField(length=5)
+        self.assertEqual("AA", field.to_python("AA   "))
 
     def test_to_python_returns_none_when_value_is_none(self):
         field = fields.FixedWidthField(length=5)

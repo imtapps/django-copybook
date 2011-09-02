@@ -5,13 +5,10 @@ In version 0.1.0 we introduce an entirely new (albeit similar) interface
 that breaks all dependency on Django and removes the necessity of
 manually setting the order of fields. We call it 'fixedwidth'.
 
-Future enhancements to fixedwidth:
-  - convert from fixed with record back into python object.
-
 Usage:
 
   from djcopybook.fixedwidth import Record
-  from djcopybook.fixedwidth import fields
+  from djcopybook.fixedwidth import fields  
 
   class Person(Record):
       first_name = fields.StringField(length=20)
@@ -31,6 +28,27 @@ fields default values, and other fun stuff.
 When you have a record instance, the data values will always be their
 python value, and when you do a to_record on the Record as a whole or
 an individual field it will have the fixedwidth format.
+
+New in version 0.1.2:
+  Convert records from a fixed width format back into record objects
+
+  USAGE:
+    class Person(Record):
+        first_name = fields.StringField(length=20)
+        last_name = fields.StringField(length=30)
+        siblings = fields.IntegerField(length=2)
+        birth_date = fields.DateField(length=10, format="%Y-%m-%d")
+
+    >>> fixedwidth_record = 'Joe                 Smith                         031982-09-11'
+    >>> person = Person.from_record(fixedwidth_record)
+    >>> person.first_name
+    'Joe'
+    >>> person.last_name
+    'Smith'
+    >>> person.siblings
+    3
+    >>> person.birth_date
+    datetime.date(1982, 9, 11)
 
 New in version 0.1.1:
   ListField: lets you have one field whose values are made of another

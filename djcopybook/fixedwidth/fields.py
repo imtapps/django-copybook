@@ -67,7 +67,7 @@ class FixedWidthField(object):
     def to_python(self, val):
         if val is None:
             return val
-        return str(val)
+        return str(val).rstrip()
 
     def to_record(self, val):
         if val is None:
@@ -154,11 +154,9 @@ class ListField(FixedWidthField):
     def _get_records_from_string(self, val):
         records = []
         record_len = len(self.record_class)
-
-        pos = 0
-        while pos <= record_len:
-            records.append(self.record_class.from_record(val[pos:pos + record_len]))
-            pos += record_len
+        for _ in range(self.length):
+            records.append(self.record_class.from_record(val[:record_len]))
+            val = val[record_len:]
         return records
 
     def to_python(self, val):
