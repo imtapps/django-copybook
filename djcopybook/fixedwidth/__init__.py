@@ -6,7 +6,9 @@ job of conveniently remembering the order of fields which is
 a necessity for a properly formatted fixed-width record.
 """
 
-from collections import OrderedDict
+# using django's SortedDict to preserve python 2.6 compatibility
+from django.utils.datastructures import SortedDict as OrderedDict
+
 from copy import deepcopy
 
 from djcopybook.fixedwidth import fields
