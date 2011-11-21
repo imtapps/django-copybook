@@ -17,15 +17,15 @@ class FieldLengthError(Exception):
 
 def str_padding(length, val):
     "Formats value giving it a right space padding up to a total length of 'length'"
-    return '{:<{fill}}'.format(val, fill=length)
+    return '{0:<{fill}}'.format(val, fill=length)
 
 def int_padding(length, val):
     "Formats value giving it left zeros padding up to a total length of 'length'"
-    return '{:0>{fill}}'.format(val, fill=length)
+    return '{0:0>{fill}}'.format(val, fill=length)
 
 def float_padding(length, val, decimals=2):
     "Pads zeros to left and right to assure proper length and precision"
-    return '{:0>{fill}.{precision}f}'.format(float(val), fill=length, precision=decimals)
+    return '{0:0>{fill}.{precision}f}'.format(float(val), fill=length, precision=decimals)
 
 
 class FixedWidthField(object):
