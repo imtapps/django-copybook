@@ -81,7 +81,7 @@ class FixedWidthField(object):
 
     def _check_record_length(self, record_val):
         if len(record_val) > self.length:
-            err = "'{attname}' value '{}' is longer than {length} chars.".format(record_val, **self.__dict__)
+            err = "'{attname}' value '{0}' is longer than {length} chars.".format(record_val, **self.__dict__)
             raise FieldLengthError(err)
 
 class StringField(FixedWidthField):
@@ -167,7 +167,7 @@ class ListField(FixedWidthField):
         if isinstance(val, basestring):
             return self._get_records_from_string(val)
         elif not all([isinstance(r, self.record_class) for r in val]):
-            msg = "List field must contain instances of '{}'.".format(self.record_class.__name__)
+            msg = "List field must contain instances of '{0}'.".format(self.record_class.__name__)
             raise TypeError(msg)
         return list(val)
 
