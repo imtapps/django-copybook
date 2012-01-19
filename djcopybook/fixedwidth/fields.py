@@ -6,22 +6,27 @@ __all__ = (
     'IntegerField',
     'DateField',
     'DecimalField',
+    'FragmentField',
     'ListField',
 )
 
 class NOT_PROVIDED(object):
     pass
 
+
 class FieldLengthError(Exception):
     pass
+
 
 def str_padding(length, val):
     "Formats value giving it a right space padding up to a total length of 'length'"
     return '{0:<{fill}}'.format(val, fill=length)
 
+
 def int_padding(length, val):
     "Formats value giving it left zeros padding up to a total length of 'length'"
     return '{0:0>{fill}}'.format(val, fill=length)
+
 
 def float_padding(length, val, decimals=2):
     "Pads zeros to left and right to assure proper length and precision"
@@ -84,8 +89,10 @@ class FixedWidthField(object):
             err = "'{attname}' value '{0}' is longer than {length} chars.".format(record_val, **self.__dict__)
             raise FieldLengthError(err)
 
+
 class StringField(FixedWidthField):
     pass
+
 
 class IntegerField(FixedWidthField):
 
@@ -98,6 +105,7 @@ class IntegerField(FixedWidthField):
         if val is None:
             val = 0
         return int_padding(self.length, val)
+
 
 class DecimalField(FixedWidthField):
 
@@ -114,6 +122,7 @@ class DecimalField(FixedWidthField):
         if val is None:
             val = 0
         return float_padding(self.length, val, decimals=self.decimals)
+
 
 class DateField(FixedWidthField):
 
@@ -135,6 +144,57 @@ class DateField(FixedWidthField):
         if not val:
             return str_padding(self.length, '')
         return val.strftime(self.format)
+
+
+class FragmentField(FixedWidthField):
+    """
+    Allows you to create a field on a record that is itself a complete
+    record. Similar to a ``ListField`` except it only occurs once.
+
+
+    class Phone(Record):
+      area_code = fields.IntegerField(length=3)
+      prefix = fields.IntegerField(length=3)
+      line_number = fields.IntegerField(length=4)
+
+    class Contact(Record):
+      name = fields.StringField(length=100)
+      phone_number = fields.FragmentField(record=Phone)
+      email = fields.StringField(length=100)
+
+    """
+
+    def __init__(self, record):
+        self.record_class = record
+        super(FragmentField, self).__init__(len(record))
+
+    def to_python(self, val):
+        """
+        :returns:
+            Always returns an instance of the record class.
+        """
+        if val is None:
+            return self.record_class()
+        if isinstance(val, basestring):
+            return self.record_class.from_record(val)
+        elif isinstance(val, self.record_class):
+            return val
+        else:
+            msg = "Redefined field must be a string or {record} instance.".format(
+                record=self.record_class.__name__)
+            raise TypeError(msg)
+
+    def to_record(self, val):
+        """
+        :param val:
+            val will either be None or an instance of ``self.record_class``
+        :returns:
+            Always returns a string spaced properly for self.record_class.
+        """
+        if val is None:
+            return self.record_class().to_record()
+        return val.to_record()
+
 
 class ListField(FixedWidthField):
     """
