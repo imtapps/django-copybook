@@ -4,9 +4,11 @@ REQUIREMENTS = [
     'django',
 ]
 
+from djcopybook import VERSION
+
 setup(
     name="django-copybook",
-    version='0.1.5',
+    version=VERSION,
     author="Matthew J. Morrison",
     author_email="mattj.morrison@gmail.com",
     description="Convert Objects and Django models to/from fixed format records.",
