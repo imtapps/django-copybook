@@ -77,10 +77,10 @@ class RecordTests(TestCase):
         r = RecordOne(field_two=10)
         self.assertEqual("AA", r.field_one)
 
-    def test_raises_type_error_when_instantiating_record_with_bad_value(self):
-        with self.assertRaises(TypeError) as e:
-            RecordOne(bad_field="test")
-        self.assertEqual("'bad_field' is an invalid keyword argument for this function", e.exception.message)
+    def test_ignores_kwarg_value_when_field_not_declared_on_record(self):
+        r = RecordOne(field_one="abc", no_field="test")
+        self.assertEqual("abc", r.field_one)
+        self.assertFalse(hasattr(r, "no_field"))
 
     def test_len_on_record_returns_total_fixed_width_length(self):
         r = RecordOne()

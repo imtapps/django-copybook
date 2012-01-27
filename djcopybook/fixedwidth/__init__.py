@@ -84,9 +84,6 @@ class BaseRecord(object):
 
             setattr(self, field.attname, val)
 
-        if kwargs:
-            raise TypeError("'{}' is an invalid keyword argument for this function".format(kwargs.keys()[0]))
-
     def __len__(self):
         """
         Total length this record will be in a fixed width format.
