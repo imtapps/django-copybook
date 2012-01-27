@@ -107,6 +107,16 @@ New in version 0.1.6:
     >>> contact.to_record()
     'Joe                 5155552222joe@example.com               '
 
+
+New in version 0.1.7:
+You can now populate a record object with a dictionary containing more items
+than the record has fields. The record will use the values if it has the
+associated fields, but will ignore extra data.
+
+This is useful when populating records from a form's cleaned_data for instance
+if the form has more data than that specific record wants.
+
+
 Notes:
   Because we are using OrderedDict, the new fixedwidth implementation
   will only work on Python 2.7 and above. (you can copy the OrderdDict
