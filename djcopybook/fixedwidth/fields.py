@@ -33,6 +33,10 @@ def float_padding(length, val, decimals=2):
     return '{0:0>{fill}.{precision}f}'.format(float(val), fill=length, precision=decimals)
 
 
+def is_blank_string(val):
+    return isinstance(val, basestring) and val.strip() == ''
+
+
 class FixedWidthField(object):
     # set a default validators?
     attname = '' # will get set to the name of the field this descriptor is being used as
@@ -97,8 +101,8 @@ class StringField(FixedWidthField):
 class IntegerField(FixedWidthField):
 
     def to_python(self, val):
-        if val is None:
-            return val
+        if val is None or is_blank_string(val):
+            return None
         return int(val)
 
     def to_record(self, val):
@@ -114,8 +118,8 @@ class DecimalField(FixedWidthField):
         super(DecimalField, self).__init__(length, default)
 
     def to_python(self, val):
-        if val is None:
-            return val
+        if val is None or is_blank_string(val):
+            return None
         return float(val)
 
     def to_record(self, val):
@@ -131,8 +135,8 @@ class DateField(FixedWidthField):
         super(DateField, self).__init__(length, default)
 
     def to_python(self, val):
-        if val is None:
-            return val
+        if val is None or is_blank_string(val):
+            return None
         if isinstance(val, datetime.datetime):
             return val.date()
         if isinstance(val, datetime.date):

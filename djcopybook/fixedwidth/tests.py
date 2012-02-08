@@ -214,6 +214,10 @@ class StringFieldTests(TestCase):
         field = fields.StringField(length=5)
         self.assertEqual(None, field.to_python(None))
 
+    def test_to_python_returns_empty_string_when_received_all_blanks(self):
+        field = fields.StringField(length=5)
+        self.assertEqual("", field.to_python("     "))
+
 class IntegerFieldTests(TestCase):
 
     def test_to_record_returns_string_of_value_padded_to_length(self):
@@ -234,6 +238,15 @@ class IntegerFieldTests(TestCase):
         field = fields.IntegerField(length=5)
         self.assertEqual(None, field.to_python(None))
 
+    def test_to_python_returns_none_when_value_is_empty_string(self):
+        field = fields.IntegerField(length=5)
+        self.assertEqual(None, field.to_python("     "))
+
+    def test_to_python_raises_value_error_when_value_given_has_characters(self):
+        field = fields.IntegerField(length=5)
+        with self.assertRaises(ValueError):
+            self.assertEqual(None, field.to_python("0001A"))
+
 class DecimalFieldTests(TestCase):
 
     def test_to_record_returns_string_value_padded_to_length(self):
@@ -253,6 +266,15 @@ class DecimalFieldTests(TestCase):
     def test_to_python_returns_none_when_value_is_none(self):
         field = fields.DecimalField(length=5)
         self.assertEqual(None, field.to_python(None))
+
+    def test_to_python_returns_none_when_value_is_empty_string(self):
+        field = fields.DecimalField(length=5)
+        self.assertEqual(None, field.to_python("     "))
+
+    def test_to_python_raises_value_error_when_value_given_has_characters(self):
+        field = fields.DecimalField(length=5)
+        with self.assertRaises(ValueError):
+            self.assertEqual(None, field.to_python("0001A"))
 
 class DateFieldTests(TestCase):
 
@@ -279,6 +301,10 @@ class DateFieldTests(TestCase):
         field = fields.DateField(length=8, format="%Y%m%d")
         self.assertEqual(None, field.to_python(None))
 
+    def test_to_python_returns_none_when_empty_string_given(self):
+        field = fields.DateField(length=8, format="%Y%m%d")
+        self.assertEqual(None, field.to_python("        "))
+
     def test_to_python_returns_date_when_already_date(self):
         field = fields.DateField(length=8, format="%Y%m%d")
         expected_date = date(2011,8,31)
@@ -292,6 +318,11 @@ class DateFieldTests(TestCase):
         python_val = field.to_python(expected_date)
         self.assertEqual(expected_date.date(), python_val)
         self.assertIsInstance(python_val, date)
+
+    def test_to_python_raises_value_error_when_value_given_has_characters(self):
+        field = fields.DateField(length=5)
+        with self.assertRaises(ValueError):
+            self.assertEqual(None, field.to_python("0001A"))
 
     def test_datefield_should_allow_string_default_date(self):
         class TestRecord(fixedwidth.Record):
