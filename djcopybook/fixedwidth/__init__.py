@@ -31,6 +31,7 @@ def get_declared_fields(bases, attrs):
             fw_fields = base.base_fields.items() + fw_fields
     return OrderedDict(fw_fields)
 
+
 class DeclarativeFieldsMetaclass(type):
     """
     Metaclass that converts Field attributes to a dictionary called
@@ -53,12 +54,15 @@ class DeclarativeFieldsMetaclass(type):
         """
         return sum(get_field_length(f) for f in cls.base_fields.values())
 
+
 class BaseRecord(object):
 
     # This is the main implementation of all the record logic. Note that this
     # class is different than Record. See the comments by the Record class for more
     # information. Any improvements to the fixedwidth API should be made to *this*
     # class, not to the Record class.
+
+    auto_truncate = False
 
     def __init__(self, **kwargs):
         # The base_fields class attribute is the *class-wide* definition of
@@ -82,6 +86,7 @@ class BaseRecord(object):
             else:
                 val = field.get_default()
 
+            field.auto_truncate = self.auto_truncate
             setattr(self, field.attname, val)
 
     def __len__(self):
@@ -126,14 +131,16 @@ class BaseRecord(object):
             pos += field_length
         return new_record
 
+
 class Record(BaseRecord):
-    "A collection of FixedWidthFields, plus their associated data."
+    """A collection of FixedWidthFields, plus their associated data."""
     # This is a separate class from BaseRecord in order to abstract the way
     # self.fields is specified. This class (Record) is the one that does the
     # fancy metaclass stuff purely for the semantic sugar -- it allows one
     # to define a fixedwidth using declarative syntax.
     # BaseCopybook itself has no way of designating self.fields.
     __metaclass__ = DeclarativeFieldsMetaclass
+
 
 def get_field_length(f):
     """

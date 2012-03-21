@@ -19,17 +19,17 @@ class FieldLengthError(Exception):
 
 
 def str_padding(length, val):
-    "Formats value giving it a right space padding up to a total length of 'length'"
+    """Formats value giving it a right space padding up to a total length of 'length'"""
     return '{0:<{fill}}'.format(val, fill=length)
 
 
 def int_padding(length, val):
-    "Formats value giving it left zeros padding up to a total length of 'length'"
+    """Formats value giving it left zeros padding up to a total length of 'length'"""
     return '{0:0>{fill}}'.format(val, fill=length)
 
 
 def float_padding(length, val, decimals=2):
-    "Pads zeros to left and right to assure proper length and precision"
+    """Pads zeros to left and right to assure proper length and precision"""
     return '{0:0>{fill}.{precision}f}'.format(float(val), fill=length, precision=decimals)
 
 
@@ -39,7 +39,8 @@ def is_blank_string(val):
 
 class FixedWidthField(object):
     # set a default validators?
-    attname = '' # will get set to the name of the field this descriptor is being used as
+    attname = ''       # will get set to the name of the field this descriptor is being used as
+    auto_truncate = '' # Gets set locally when record is initialized.
 
     # Tracks each time a Field instance is created. Used to retain order.
     creation_counter = 0
@@ -85,6 +86,8 @@ class FixedWidthField(object):
 
     def get_record_value(self, val):
         record_val = self.to_record(val)
+        if self.auto_truncate:
+            record_val = record_val[:self.length]
         self._check_record_length(record_val)
         return record_val
 

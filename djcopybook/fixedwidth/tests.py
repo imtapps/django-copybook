@@ -22,6 +22,8 @@ class RecordOne(fixedwidth.Record):
     field_two = fields.IntegerField(length=7)
 
 class RecordTwo(RecordOne):
+    auto_truncate = True
+
     field_three = fields.DecimalField(length=9)
     field_four = fields.DateField(length=2)
 
@@ -52,12 +54,27 @@ class PaddingTests(TestCase):
         self.assertEqual("000010.123", fields.float_padding(10, 10.1234, 3))
         self.assertEqual("0005.123", fields.float_padding(8, "5.1234", 3))
 
+
 class RecordTests(TestCase):
 
     def test_keeps_list_of_fields_in_order_when_record_is_instantiated(self):
         r = RecordOne()
         self.assertEqual(['field_one', 'field_two'], r.fields.keys())
         self.assertEqual(['field_one', 'field_two'], r.base_fields.keys())
+
+    def test_sets_auto_truncate_field_on_fields_when_instantiated(self):
+        r = RecordOne() # defaults auto_truncate to False
+
+        self.assertEqual(2, len(r.fields)) # sanity check
+        for field in r.fields.values():
+            self.assertEqual(False, field.auto_truncate)
+
+    def test_sets_auto_truncate_field_on_fields_when_turned_on(self):
+        r = RecordTwo() # this record has auto_truncate turned on
+
+        self.assertEqual(4, len(r.fields)) # sanity check
+        for field in r.fields.values():
+            self.assertEqual(True, field.auto_truncate)
 
     def test_record_inheritance_maintains_order(self):
         r = RecordTwo()
@@ -144,18 +161,37 @@ class RecordTests(TestCase):
             RecordOne.from_record("test 00005000")
         self.assertEqual("Fixed width record length is 13 but should be 12.", e.exception.message)
 
+    def test_truncates_each_field_when_auto_truncate(self):
+        class TruncRecord(fixedwidth.Record):
+            auto_truncate=True
 
+            char = fields.StringField(length=2)
+            integer = fields.IntegerField(length=3)
+
+        r = TruncRecord(char="Too long", integer=12345)
+        record = r.to_record()
+        self.assertEqual("To123", record)
 
 class FixedWidthFieldTests(TestCase):
 
+    def get_field(self, auto_truncate=False, **kwargs):
+        f = fields.FixedWidthField(**kwargs)
+        f.attname = "field_one" # fake these two. Record sets them on instantiation
+        f.auto_truncate = auto_truncate
+        return f
+
     def test_raises_field_length_error_when_value_is_longer_than_allowed(self):
-        f = fields.FixedWidthField(length=5)
-        f.attname = "field_one" # fake for test... fixedwidth sets this on instantiation
+        f = self.get_field(length=5)
         with self.assertRaises(fields.FieldLengthError) as e:
             f.get_record_value("This is a long")
 
         msg = "'field_one' value 'This is a long' is longer than 5 chars."
         self.assertEqual(msg, e.exception.message)
+
+    def test_truncates_field_length_when_has_auto_truncate_on(self):
+        f = self.get_field(auto_truncate=True, length=5)
+        val = f.get_record_value("This is too long")
+        self.assertEqual("This ", val)
 
     def test_get_default_returns_none_when_no_default(self):
         field = fields.FixedWidthField(length=5)
@@ -194,6 +230,7 @@ class FixedWidthFieldTests(TestCase):
         field = fields.FixedWidthField(length=5)
         self.assertEqual(None, field.to_python(None))
 
+
 class StringFieldTests(TestCase):
 
     def test_to_record_returns_string_of_value_padded_to_length(self):
@@ -217,6 +254,7 @@ class StringFieldTests(TestCase):
     def test_to_python_returns_empty_string_when_received_all_blanks(self):
         field = fields.StringField(length=5)
         self.assertEqual("", field.to_python("     "))
+
 
 class IntegerFieldTests(TestCase):
 
@@ -247,6 +285,7 @@ class IntegerFieldTests(TestCase):
         with self.assertRaises(ValueError):
             self.assertEqual(None, field.to_python("0001A"))
 
+
 class DecimalFieldTests(TestCase):
 
     def test_to_record_returns_string_value_padded_to_length(self):
@@ -275,6 +314,7 @@ class DecimalFieldTests(TestCase):
         field = fields.DecimalField(length=5)
         with self.assertRaises(ValueError):
             self.assertEqual(None, field.to_python("0001A"))
+
 
 class DateFieldTests(TestCase):
 
