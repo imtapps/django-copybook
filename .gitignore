@@ -6,3 +6,7 @@
 build/*
 dist/*
 example.db
+.coverage
+coverage.xml
+nosetests.xml
+jenkins_reports/*

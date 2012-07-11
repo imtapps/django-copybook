@@ -4,6 +4,10 @@ REQUIREMENTS = [
     'django',
 ]
 
+TEST_REQUIREMENTS = REQUIREMENTS = [
+    'django_nose',
+]
+
 from djcopybook import VERSION
 
 setup(
@@ -15,8 +19,7 @@ setup(
     long_description=open('README.txt', 'r').read(),
     packages=find_packages(exclude=["example"],),
     install_requires=REQUIREMENTS,
-    tests_require=REQUIREMENTS,
-    test_suite='runtests.runtests',
+    tests_require=TEST_REQUIREMENTS,
     zip_safe=False,
     classifiers = [
         "Development Status :: 4 - Beta",

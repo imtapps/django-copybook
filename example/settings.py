@@ -17,4 +17,7 @@ DATABASES = {
 INSTALLED_APPS = (
     'sample',
     'djcopybook',
+    'django_nose',
 )
+
+TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
