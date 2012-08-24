@@ -23,10 +23,9 @@ def str_padding(length, val):
     return '{0:<{fill}}'.format(val, fill=length)
 
 
-def int_padding(length, val):
+def int_padding(length, val, direction=">"):
     """Formats value giving it left zeros padding up to a total length of 'length'"""
-    return '{0:0>{fill}}'.format(val, fill=length)
-
+    return '{0:0{direction}{fill}}'.format(val, direction=direction, fill=length)
 
 def float_padding(length, val, decimals=2):
     """Pads zeros to left and right to assure proper length and precision"""
@@ -99,6 +98,21 @@ class FixedWidthField(object):
 
 class StringField(FixedWidthField):
     pass
+
+
+class PostalCodeField(FixedWidthField):
+
+    def __init__(self):
+        super(PostalCodeField, self).__init__(length=9)
+
+    def to_record(self, val):
+        if val is None or is_blank_string(val):
+            return str_padding(self.length, " ")
+        try:
+            int(val)
+            return int_padding(self.length, val, "<")
+        except ValueError:
+            return str_padding(self.length, val)
 
 
 class IntegerField(FixedWidthField):
