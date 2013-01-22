@@ -5,6 +5,7 @@ __all__ = (
     'StringField',
     'IntegerField',
     'DateField',
+    'DateTimeField',
     'DecimalField',
     'FragmentField',
     'ListField',
@@ -155,9 +156,9 @@ class DateTimeField(FixedWidthField):
         if val is None or is_blank_string(val):
             return None
         if isinstance(val, datetime.datetime):
-            return val.date()
-        if isinstance(val, datetime.date):
             return val
+        if isinstance(val, datetime.date):
+            return datetime.datetime(val.year, val.month, val.day)
 
         return datetime.datetime.strptime(val, self.format)
 
