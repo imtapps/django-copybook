@@ -349,6 +349,17 @@ class DecimalFieldTests(TestCase):
             self.assertEqual(None, field.to_python("0001A"))
 
 
+class DateTimeFieldTests(TestCase):
+
+    def test_to_record_returns_formatted_datetime(self):
+        field = fields.DateTimeField(length=14, format="%Y%m%d%H%M%S")
+        self.assertEqual("20120101010101", field.to_record(datetime(2012, 1, 1, 1, 1, 1)))
+
+    def test_to_model_returns_datetime_object(self):
+        field = fields.DateTimeField(length=14, format="%Y%m%d%H%M%S")
+        self.assertEqual(datetime(2012, 1, 1, 1, 1, 1), field.to_python("20120101010101"))
+
+
 class DateFieldTests(TestCase):
 
     def test_to_record_returns_formatted_date(self):

@@ -145,11 +145,11 @@ class DecimalField(FixedWidthField):
         return float_padding(self.length, val, decimals=self.decimals)
 
 
-class DateField(FixedWidthField):
+class DateTimeField(FixedWidthField):
 
     def __init__(self, length, default=NOT_PROVIDED, format="%Y-%m-%d"):
         self.format = format
-        super(DateField, self).__init__(length, default)
+        super(DateTimeField, self).__init__(length, default)
 
     def to_python(self, val):
         if val is None or is_blank_string(val):
@@ -159,12 +159,21 @@ class DateField(FixedWidthField):
         if isinstance(val, datetime.date):
             return val
 
-        return datetime.datetime.strptime(val, self.format).date()
+        return datetime.datetime.strptime(val, self.format)
 
     def to_record(self, val):
         if not val:
             return str_padding(self.length, '')
         return val.strftime(self.format)
+
+
+class DateField(DateTimeField):
+
+    def to_python(self, val):
+        result = super(DateField, self).to_python(val)
+        if isinstance(result, datetime.datetime):
+            return result.date()
+        return result
 
 
 class FragmentField(FixedWidthField):
