@@ -16,6 +16,7 @@ setup(
     author="Matthew J. Morrison",
     author_email="mattj.morrison@gmail.com",
     description="Convert Objects and Django models to/from fixed format records.",
+    url="https://github.com/imtapps/django-copybook",
     long_description=open('README.txt', 'r').read(),
     packages=find_packages(exclude=["example"],),
     install_requires=REQUIREMENTS,
