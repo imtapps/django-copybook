@@ -5,7 +5,7 @@ REQUIREMENTS = [
 ]
 
 TEST_REQUIREMENTS = REQUIREMENTS = [
-    'django_nose',
+    'django_nose==1.1.IMT',
 ]
 
 from djcopybook import VERSION
