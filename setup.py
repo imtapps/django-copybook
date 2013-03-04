@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 
 REQUIREMENTS = [
-    'django',
+    'django<1.5.0',
 ]
 
 TEST_REQUIREMENTS = REQUIREMENTS = [
