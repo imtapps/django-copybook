@@ -14,7 +14,7 @@ find . -name "*.pyc" -delete
 
 rm -rf jenkins_reports
 mkdir jenkins_reports
-pip install -r requirements/test.txt -i http://localhost:8888/simple/
+pip install -r requirements/test.txt
 python example/manage.py test --with-xunit --with-xcover --cover-package=djcopybook
 TEST_EXIT=$?
 pep8 djcopybook > jenkins_reports/pep8.report
