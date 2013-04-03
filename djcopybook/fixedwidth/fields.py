@@ -8,6 +8,7 @@ __all__ = (
     'DateTimeField',
     'DecimalField',
     'FragmentField',
+    'FragmentWithNewlineField',
     'ListField',
 )
 
@@ -225,6 +226,15 @@ class FragmentField(FixedWidthField):
         if val is None:
             return self.record_class().to_record()
         return val.to_record()
+
+
+class FragmentWithNewlineField(FragmentField):
+
+    def to_record(self, val):
+        self.length += 1
+        if val is None:
+            return self.record_class().to_record() + '\n'
+        return val.to_record() + '\n'
 
 
 class ListField(FixedWidthField):
