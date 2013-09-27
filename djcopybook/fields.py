@@ -205,12 +205,18 @@ class List(Type):
             values.append(self.copybook.from_dict(model_data))
         self.value = values
 
-    def to_copybook(self):
+    @property
+    def _get_list_of_values(self):
         values = [val for val in self.value]
         while len(values) < self.length:
             values.append(self.copybook(to_copybook=True))
+        return values
 
-        return ''.join([val.to_record() for val in values])
+    def to_copybook(self):
+        return ''.join([val.to_record() for val in self._get_list_of_values])
+
+    def to_json_friendly_dict(self):
+        return [val.to_json_friendly_dict() for val in self._get_list_of_values]
 
     def to_model(self):
         return self.value

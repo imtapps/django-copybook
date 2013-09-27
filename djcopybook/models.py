@@ -7,7 +7,9 @@ updating to different versions of Django
 """
 
 import re
+from . import extractor
 from django.db.models.fields.related import RelatedField, ForeignKey
+
 
 class DictTools(object):
 
@@ -160,15 +162,13 @@ class Copybook(object):
         return model
 
     @turn_off_flags
+    def to_json_friendly_dict(self):
+        return extractor.DictExtractor(self).build_data_structure_from_copybook()
+        
+    @turn_off_flags
     def _build_field_list(self):
-        "build a list of fields in this copybook"
-        fields = []
-        for field_name in dir(self):
-            if not re.match(r'^__', field_name):
-                field = getattr(self, field_name)
-                if hasattr(field, 'order'):
-                    fields.append(field)
-        return sorted(fields, key=lambda field: field.order)
+        data_list = extractor.ListExtractor(self).build_data_structure_from_copybook()
+        return sorted(data_list, key=lambda field: field.order)
 
     @classmethod
     def from_dict(cls, dictionary):

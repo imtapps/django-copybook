@@ -14,6 +14,8 @@ DATABASES = {
     }
 }
 
+SECRET_KEY = 'foo'
+
 INSTALLED_APPS = (
     'sample',
     'djcopybook',

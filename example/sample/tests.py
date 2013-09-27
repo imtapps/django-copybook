@@ -479,6 +479,22 @@ class CopybookTests(test.TestCase):
         self.copybook.fourth_field = 3
         self.copybook.fifth_field = "D"
 
+    def test_convert_legit_copybook_into_dict(self):
+        class SampleListTwo(models.Copybook):
+            one = fields.IntegerField(length=1, order=1)
+        class SampleList(models.Copybook):
+            done = fields.IntegerField(length=1, order=1)
+            more = fields.StringField(length=1, order=2)
+            almost = fields.ListField(length=1, order=3, copybook=SampleListTwo)
+        class Sample(models.Copybook):
+            foo = fields.IntegerField(length=1, order=1)
+            bar = fields.StringField(length=2, order=2)
+            baz = fields.ListField(length=2, order=3, copybook=SampleList)
+            bat = fields.DecimalField(length=6, order=4)
+        copybook = Sample.from_record("1AB0X2234247.23")
+        expected = {'bar': 'AB', 'bat': 247.23, 'baz': [{'almost': [{'one': 2}], 'done': 0, 'more': 'X'}, {'almost': [{'one': 4}], 'done': 2, 'more': '3'}], 'foo': 1}
+        self.assertEqual(copybook.to_json_friendly_dict(), expected)
+
     def test_convert_copybook_into_dict(self):
         copybook = copybooks.SecondCopybook(to_copybook=True)
         copybook.one = "1"
