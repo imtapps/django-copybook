@@ -141,19 +141,21 @@ class DateTimeField(FixedWidthField):
         super(DateTimeField, self).__init__(length, default)
 
     def to_python(self, val):
-        if val is None or is_blank_string(val):
-            return None
-        if isinstance(val, datetime.datetime):
-            return val
-        if isinstance(val, datetime.date):
-            return datetime.datetime(val.year, val.month, val.day)
-
-        return datetime.datetime.strptime(val, self.format)
+        value_dict = {
+            type(None): lambda v: None,
+            str: self._format_string_date,
+            datetime.datetime: lambda v: v,
+            datetime.date: lambda v: datetime.datetime(v.year, v.month, v.day),
+        }
+        return value_dict[type(val)](val)
 
     def to_record(self, val):
         if not val:
             return str_padding(self.length, '')
         return val.strftime(self.format)
+
+    def _format_string_date(self, val):
+        return None if val.strip() == '' else datetime.datetime.strptime(val, self.format)
 
 
 class DateField(DateTimeField):
@@ -192,15 +194,15 @@ class FragmentField(FixedWidthField):
         :returns:
             Always returns an instance of the record class.
         """
-        if val is None:
-            return self.record_class()
-        if isinstance(val, basestring):
-            return self.record_class.from_record(val)
-        elif isinstance(val, self.record_class):
-            return val
-        elif isinstance(val, dict):
-            return self.record_class(**val)
-        else:
+        value_dict = {
+            type(None): lambda v: self.record_class(),
+            str: self.record_class.from_record,
+            self.record_class: lambda v: v,
+            dict: lambda v: self.record_class(**v),
+        }
+        try:
+            return value_dict[type(val)](val)
+        except KeyError:
             msg = "Redefined field must be a string or {record} instance.".format(
                 record=self.record_class.__name__)
             raise TypeError(msg)
@@ -250,14 +252,16 @@ class ListField(FixedWidthField):
         return records
 
     def to_python(self, val):
-        """
-        the python representation should be a list of instantiated
-        Record classes.
-        """
+        value_dict = {
+            str: self._get_records_from_string,
+            list: self._sequence_to_python,
+            tuple: self._sequence_to_python,
+        }
+        return value_dict.get(type(val))(val)
+
+    def _sequence_to_python(self, val):
         if all([isinstance(r, dict) for r in val]):
             return [self.record_class(**r) for r in val]
-        if isinstance(val, basestring):
-            return self._get_records_from_string(val)
         if not all([isinstance(r, self.record_class) for r in val]):
             msg = "List field must contain instances of '{0}'.".format(self.record_class.__name__)
             raise TypeError(msg)
