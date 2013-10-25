@@ -1,10 +1,8 @@
 from setuptools import setup, find_packages
 
-from djcopybook import VERSION
-
 setup(
     name="django-copybook",
-    version=VERSION,
+    version='1.0.0',
     author="imtapps",
     author_email="webadmin@imtapps.com",
     description="Convert Objects and Django models to/from fixed format records.",
@@ -13,7 +11,7 @@ setup(
     packages=find_packages(exclude=["example"],),
     install_requires=open('requirements/dist.txt').read(),
     zip_safe=False,
-    classifiers = [
+    classifiers=[
         "Development Status :: 4 - Beta",
         "Framework :: Django",
         "Intended Audience :: Developers",

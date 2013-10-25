@@ -54,3 +54,9 @@ class FragmentFieldTests(unittest.TestCase):
         r.frag.field_two = 999
 
         self.assertEqual("aaa  0000999BBB", r.to_record())
+
+    def test_populates_nested_dictionaries(self):
+        input_data = {'garf': {'frag': {'field_one': 'abc', 'field_two': 100}}}
+        my_record = record_helper.RecordFive(**input_data)
+        self.assertEqual(my_record.garf.frag.field_one, 'abc')
+        self.assertEqual(my_record.garf.frag.field_two, 100)

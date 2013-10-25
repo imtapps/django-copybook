@@ -22,3 +22,8 @@ class RecordThree(fixedwidth.Record):
 class RecordFour(fixedwidth.Record):
     frag = fields.FragmentWithNewlineField(record=RecordOne)
     other_field = fields.StringField(length=3, default="EEE")
+
+
+class RecordFive(fixedwidth.Record):
+    garf = fields.FragmentWithNewlineField(RecordFour)
+    threeve = fields.ListField(record=RecordThree, length=2)

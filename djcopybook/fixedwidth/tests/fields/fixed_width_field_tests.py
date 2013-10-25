@@ -1,6 +1,7 @@
 import unittest
 
 from djcopybook.fixedwidth import fields
+from djcopybook.fixedwidth.tests.record_helper import RecordOne
 
 
 class FixedWidthFieldTests(unittest.TestCase):
@@ -60,3 +61,12 @@ class FixedWidthFieldTests(unittest.TestCase):
     def test_to_python_returns_none_when_value_is_none(self):
         field = fields.FixedWidthField(length=5)
         self.assertEqual(None, field.to_python(None))
+
+    def test_returns_default_when_removed_from_record(self):
+        record = RecordOne()
+        record_dir = dir(record)
+        for item in record_dir:
+            if item.startswith('field_one'):
+                field_name = item
+        delattr(record, field_name)
+        self.assertEqual('AA', record.field_one)

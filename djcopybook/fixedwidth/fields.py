@@ -198,6 +198,8 @@ class FragmentField(FixedWidthField):
             return self.record_class.from_record(val)
         elif isinstance(val, self.record_class):
             return val
+        elif isinstance(val, dict):
+            return self.record_class(**val)
         else:
             msg = "Redefined field must be a string or {record} instance.".format(
                 record=self.record_class.__name__)
@@ -252,9 +254,11 @@ class ListField(FixedWidthField):
         the python representation should be a list of instantiated
         Record classes.
         """
+        if all([isinstance(r, dict) for r in val]):
+            return [self.record_class(**r) for r in val]
         if isinstance(val, basestring):
             return self._get_records_from_string(val)
-        elif not all([isinstance(r, self.record_class) for r in val]):
+        if not all([isinstance(r, self.record_class) for r in val]):
             msg = "List field must contain instances of '{0}'.".format(self.record_class.__name__)
             raise TypeError(msg)
         return list(val)

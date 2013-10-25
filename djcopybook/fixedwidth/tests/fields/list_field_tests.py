@@ -54,6 +54,7 @@ class ListFieldTests(unittest.TestCase):
         self.assertEqual("AAAAA1111111BBBBB2222222", r.to_record())
 
     def test_to_record_pads_with_empty_records_when_not_all_records_used(self):
+
         class ListRecord(fixedwidth.Record):
             field_one = fields.StringField(length=5)
             field_two = fields.IntegerField(length=7)
@@ -80,3 +81,16 @@ class ListFieldTests(unittest.TestCase):
             list_field._check_record_length(''.join(r.to_record() for r in records))
 
         self.assertEqual("'list_field' contains 3 records but can only have 2.", str(e.exception))
+
+    def test_populates_list_field_with_nested_dictionaries(self):
+        input_data = {'threeve': [
+            {'other_field': 'xyz', 'frag': {'field_one': 1, 'field_two': 2}},
+            {'other_field': 'abc', 'frag': {'field_one': 3, 'field_two': 4}}
+        ]}
+        record = record_helper.RecordFive(**input_data)
+        self.assertEqual('xyz', record.threeve[0].other_field)
+        self.assertEqual('abc', record.threeve[1].other_field)
+        self.assertEqual('1', record.threeve[0].frag.field_one)
+        self.assertEqual('3', record.threeve[1].frag.field_one)
+        self.assertEqual(2, record.threeve[0].frag.field_two)
+        self.assertEqual(4, record.threeve[1].frag.field_two)
