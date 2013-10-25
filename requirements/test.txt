@@ -1,5 +1,0 @@
-django_nose
-nosexcover
-pep8
-pyflakes
-

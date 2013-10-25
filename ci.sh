@@ -14,18 +14,19 @@ find . -name "*.pyc" -delete
 
 rm -rf jenkins_reports
 mkdir jenkins_reports
-pip install -r requirements/test.txt
+
+pip install -r requirements/ci.txt
+
 python example/manage.py test --with-xunit --with-xcover --cover-package=djcopybook
 TEST_EXIT=$?
-pep8 djcopybook > jenkins_reports/pep8.report
-PEP8_EXIT=$?
-pyflakes djcopybook > jenkins_reports/pyflakes.report
-PYFLAKES_EXIT=$?
-let JENKINS_EXIT="$TEST_EXIT +  $PEP8_EXIT + $PYFLAKES_EXIT"
-if [ $JENKINS_EXIT -gt 2 ]; then
+
+flake8 djcopybook --max-line-length=120 --max-complexity=6 | awk -F\: '{printf "%s:%s: [E]%s%s\n", $1, $2, $3, $4}' > jenkins_reports/flake8.txt
+FLAKE8_EXIT=`cat jenkins_reports/flake8.txt | wc -l`
+
+let JENKINS_EXIT="$TEST_EXIT +  $FLAKE8_EXIT"
+if [ $JENKINS_EXIT -gt 0 ]; then
     echo "Test exit status:" $TEST_EXIT
-    echo "PEP8 exit status:" $PEP8_EXIT
-    echo "Pyflakes exit status:" $PYFLAKES_EXIT
-    echo "Exiting Build with status:" $EXIT
+    echo "FLAKE8 exit status:" $FLAKE8_EXIT
+    echo "Exiting Build with status:" $JENKINS_EXIT
     exit $JENKINS_EXIT
 fi

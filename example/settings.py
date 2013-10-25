@@ -1,5 +1,3 @@
-# app lives in a directory above our example
-# project so we need to make sure it is findable on our path.
 import sys
 from os.path import abspath, dirname, join
 parent = abspath(dirname(__file__))
@@ -17,7 +15,6 @@ DATABASES = {
 SECRET_KEY = 'foo'
 
 INSTALLED_APPS = (
-    'sample',
     'djcopybook',
     'django_nose',
 )

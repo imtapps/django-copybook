@@ -1,26 +1,17 @@
 from setuptools import setup, find_packages
 
-REQUIREMENTS = [
-    'django<1.5.0',
-]
-
-TEST_REQUIREMENTS = REQUIREMENTS = [
-    'django_nose==1.1.IMT',
-]
-
 from djcopybook import VERSION
 
 setup(
     name="django-copybook",
     version=VERSION,
-    author="Matthew J. Morrison",
-    author_email="mattj.morrison@gmail.com",
+    author="imtapps",
+    author_email="webadmin@imtapps.com",
     description="Convert Objects and Django models to/from fixed format records.",
     url="https://github.com/imtapps/django-copybook",
     long_description=open('README.txt', 'r').read(),
     packages=find_packages(exclude=["example"],),
-    install_requires=REQUIREMENTS,
-    tests_require=TEST_REQUIREMENTS,
+    install_requires=open('requirements/dist.txt').read(),
     zip_safe=False,
     classifiers = [
         "Development Status :: 4 - Beta",

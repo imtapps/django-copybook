@@ -1,19 +1,7 @@
-
-"""
-Borrowed extensively from django's forms for the setup and base
-functionality of the 'Record' class. Django's forms do a nice
-job of conveniently remembering the order of fields which is
-a necessity for a properly formatted fixed-width record.
-"""
-
-# using django's SortedDict to preserve python 2.6 compatibility
 from django.utils.datastructures import SortedDict as OrderedDict
-
 from copy import deepcopy
-
 from djcopybook.fixedwidth import fields
 
-__all__ = ('Record',)
 
 def get_declared_fields(bases, attrs):
     """
@@ -39,8 +27,7 @@ class DeclarativeFieldsMetaclass(type):
     """
     def __new__(cls, name, bases, attrs):
         attrs['base_fields'] = get_declared_fields(bases, attrs)
-        new_class = super(DeclarativeFieldsMetaclass,
-                     cls).__new__(cls, name, bases, attrs)
+        new_class = super(DeclarativeFieldsMetaclass, cls).__new__(cls, name, bases, attrs)
 
         # useful to let each FixedWidthField field know its attribute name
         for field_name, field in new_class.base_fields.items():
@@ -56,38 +43,24 @@ class DeclarativeFieldsMetaclass(type):
 
 
 class BaseRecord(object):
-
-    # This is the main implementation of all the record logic. Note that this
-    # class is different than Record. See the comments by the Record class for more
-    # information. Any improvements to the fixedwidth API should be made to *this*
-    # class, not to the Record class.
-
     auto_truncate = False
 
     def __init__(self, **kwargs):
-        # The base_fields class attribute is the *class-wide* definition of
-        # fields. Because a particular *instance* of the class might want to
-        # alter self.fields, we create self.fields here by copying base_fields.
-        # Instances should always modify self.fields; they should not modify
-        # self.base_fields.
         self.fields = deepcopy(self.base_fields)
-
-        # populate the fixedwidth fields from the keyword arguments passed in.
         fields_iter = iter(self.fields.values())
         for field in fields_iter:
-            if kwargs:
-                try:
-                    val = kwargs.pop(field.attname)
-                except KeyError:
-                    # This is done with an exception rather than the
-                    # default argument on pop because we don't want
-                    # get_default() to be evaluated, and then not used.
-                    val = field.get_default()
-            else:
-                val = field.get_default()
-
             field.auto_truncate = self.auto_truncate
+            val = self.get_default_value(field, kwargs)
             setattr(self, field.attname, val)
+
+    def get_default_value(self, field, kwargs):
+        if kwargs:
+            try:
+                return kwargs.pop(field.attname)
+            except KeyError:
+                return field.get_default()
+        else:
+            return field.get_default()
 
     def __len__(self):
         """

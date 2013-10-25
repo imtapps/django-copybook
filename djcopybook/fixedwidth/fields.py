@@ -1,16 +1,5 @@
-
 import datetime
 
-__all__ = (
-    'StringField',
-    'IntegerField',
-    'DateField',
-    'DateTimeField',
-    'DecimalField',
-    'FragmentField',
-    'FragmentWithNewlineField',
-    'ListField',
-)
 
 class NOT_PROVIDED(object):
     pass
@@ -29,6 +18,7 @@ def int_padding(length, val, direction=">"):
     """Formats value giving it left zeros padding up to a total length of 'length'"""
     return '{0:0{direction}{fill}}'.format(val, direction=direction, fill=length)
 
+
 def float_padding(length, val, decimals=2):
     """Pads zeros to left and right to assure proper length and precision"""
     return '{0:0>{fill}.{precision}f}'.format(float(val), fill=length, precision=decimals)
@@ -39,11 +29,8 @@ def is_blank_string(val):
 
 
 class FixedWidthField(object):
-    # set a default validators?
-    attname = ''       # will get set to the name of the field this descriptor is being used as
-    auto_truncate = '' # Gets set locally when record is initialized.
-
-    # Tracks each time a Field instance is created. Used to retain order.
+    attname = ''
+    auto_truncate = ''
     creation_counter = 0
 
     def __init__(self, length, default=NOT_PROVIDED):
