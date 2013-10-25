@@ -48,6 +48,13 @@ class FragmentFieldTests(unittest.TestCase):
         self.assertEqual("ZZZ", r.other_field)
         self.assertIsInstance(r.frag, record_helper.RecordOne)
 
+    def test_creates_record_object_properly_from_unicode(self):
+        r = record_helper.RecordThree.from_record(u"aaaaa9999999ZZZ")
+        self.assertEqual("aaaaa", r.frag.field_one)
+        self.assertEqual(9999999, r.frag.field_two)
+        self.assertEqual("ZZZ", r.other_field)
+        self.assertIsInstance(r.frag, record_helper.RecordOne)
+
     def test_creates_record_object_properly_from_string_with_multiple_values(self):
         r = record_helper.RecordThree()
         r.frag.field_one = "aaa"

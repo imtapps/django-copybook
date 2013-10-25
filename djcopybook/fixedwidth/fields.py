@@ -144,6 +144,7 @@ class DateTimeField(FixedWidthField):
         value_dict = {
             type(None): lambda v: None,
             str: self._format_string_date,
+            unicode: self._format_string_date,
             datetime.datetime: lambda v: v,
             datetime.date: lambda v: datetime.datetime(v.year, v.month, v.day),
         }
@@ -197,6 +198,7 @@ class FragmentField(FixedWidthField):
         value_dict = {
             type(None): lambda v: self.record_class(),
             str: self.record_class.from_record,
+            unicode: self.record_class.from_record,
             self.record_class: lambda v: v,
             dict: lambda v: self.record_class(**v),
         }
@@ -254,6 +256,7 @@ class ListField(FixedWidthField):
     def to_python(self, val):
         value_dict = {
             str: self._get_records_from_string,
+            unicode: self._get_records_from_string,
             list: self._sequence_to_python,
             tuple: self._sequence_to_python,
         }

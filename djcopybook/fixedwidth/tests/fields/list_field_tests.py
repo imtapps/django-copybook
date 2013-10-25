@@ -28,6 +28,20 @@ class ListFieldTests(unittest.TestCase):
         self.assertEqual("ZYXWV", record_two.field_one)
         self.assertEqual(9999999, record_two.field_two)
 
+    def test_to_python_returns_list_of_records_when_given_unicode(self):
+        f = fields.ListField(record=record_helper.RecordOne, length=2)
+
+        records = f.to_python(u"ABCDE1111111ZYXWV9999999")
+        self.assertEqual(len(records), 2)
+
+        record_one = records[0]
+        self.assertEqual("ABCDE", record_one.field_one)
+        self.assertEqual(1111111, record_one.field_two)
+
+        record_two = records[1]
+        self.assertEqual("ZYXWV", record_two.field_one)
+        self.assertEqual(9999999, record_two.field_two)
+
     def test_to_python_raises_type_error_when_not_given_record_class_instances(self):
         f = fields.ListField(record=record_helper.RecordOne, length=2)
         records = [record_helper.RecordOne(), fixedwidth.Record()]

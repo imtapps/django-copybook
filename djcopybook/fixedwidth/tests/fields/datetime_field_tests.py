@@ -35,3 +35,6 @@ class DateTimeFieldTests(unittest.TestCase):
 
     def test_to_python_returns_datetime_object_when_passed_string(self):
         self.assertEqual(datetime(2012, 1, 1, 1, 1, 1), self.sut.to_python("20120101010101"))
+
+    def test_to_python_returns_datetime_object_when_unicode(self):
+        self.assertEqual(datetime(2012, 1, 1, 1, 1, 1), self.sut.to_python(u"20120101010101"))
