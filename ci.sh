@@ -20,7 +20,7 @@ pip install -r requirements/ci.txt
 python manage.py test --with-xunit --with-xcover --cover-package=djcopybook
 TEST_EXIT=$?
 
-flake8 djcopybook --max-line-length=120 --max-complexity=6 | awk -F\: '{printf "%s:%s: [E]%s%s\n", $1, $2, $3, $4}' > jenkins_reports/flake8.txt
+flake8 djcopybook --max-line-length=120 --max-complexity=5 | awk -F\: '{printf "%s:%s: [E]%s%s\n", $1, $2, $3, $4}' > jenkins_reports/flake8.txt
 FLAKE8_EXIT=`cat jenkins_reports/flake8.txt | wc -l`
 
 let JENKINS_EXIT="$TEST_EXIT +  $FLAKE8_EXIT"
