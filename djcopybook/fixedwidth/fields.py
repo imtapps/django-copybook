@@ -89,6 +89,17 @@ class StringField(FixedWidthField):
     pass
 
 
+class NewLineField(FixedWidthField):
+
+    def __init__(self):
+        super(NewLineField, self).__init__(length=1, default='\n')
+
+    def to_python(self, val):
+        if val is None:
+            return val
+        return str(val)
+
+
 class PostalCodeField(FixedWidthField):
 
     def __init__(self):
@@ -219,15 +230,6 @@ class FragmentField(FixedWidthField):
         if val is None:
             return self.record_class().to_record()
         return val.to_record()
-
-
-class FragmentWithNewlineField(FragmentField):
-
-    def to_record(self, val):
-        self.length += 1
-        if val is None:
-            return self.record_class().to_record() + '\n'
-        return val.to_record() + '\n'
 
 
 class ListField(FixedWidthField):

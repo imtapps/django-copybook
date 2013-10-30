@@ -67,3 +67,4 @@ class FragmentFieldTests(unittest.TestCase):
         my_record = record_helper.RecordFive(**input_data)
         self.assertEqual(my_record.garf.frag.field_one, 'abc')
         self.assertEqual(my_record.garf.frag.field_two, 100)
+        self.assertEqual('abc  0000100\nEEE\nAA   0000000BBBAA   0000000BBB', str(my_record))
