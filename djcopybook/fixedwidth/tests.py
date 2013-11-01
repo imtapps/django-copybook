@@ -5,6 +5,8 @@ from unittest import TestCase
 from djcopybook import fixedwidth
 from djcopybook.fixedwidth import fields
 
+from djcopybook import fields as old_fields
+
 __all__ = (
     'PaddingTests',
     'RecordTests',
@@ -66,6 +68,26 @@ class PaddingTests(TestCase):
 
 
 class RecordTests(TestCase):
+
+    def test_signed_decimal_record_can_handle_a_float(self):
+        from djcopybook.models import Copybook
+        class SignedDecimalRecord(Copybook):
+            field_one = old_fields.SignedDecimalField(length=9, order=1)
+
+        record = SignedDecimalRecord(to_copybook=True)
+        record.field_one = 10.00
+        r = record.to_record()
+        self.assertEqual('+00010.00', r)
+
+    def test_signed_decimal_record_can_handle_a_string(self):
+        from djcopybook.models import Copybook
+        class SignedDecimalRecord(Copybook):
+            field_one = old_fields.SignedDecimalField(length=9, order=1)
+
+        record = SignedDecimalRecord(to_copybook=True)
+        record.field_one = '10.00'
+        r = record.to_record()
+        self.assertEqual('+00010.00', r)
 
     def test_keeps_list_of_fields_in_order_when_record_is_instantiated(self):
         r = RecordOne()

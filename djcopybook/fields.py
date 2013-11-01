@@ -145,7 +145,7 @@ class SignedDecimal(Decimal):
 
     @property
     def trunc_length(self):
-        if int(self.value) > 1:
+        if float(self.value) > 1:
             return self.length - 1
         return self.length
 

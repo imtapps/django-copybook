@@ -1,3 +1,9 @@
+STOP STOP STOP STOP STOP STOP STOP!!!!!!!
+Don't kill this branch!!!!!
+
+It's old and unloved but apps-rating uses it.
+
+#################################################
 
 This app allows you to convert objects into fixed width records.
 
