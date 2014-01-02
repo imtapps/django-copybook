@@ -366,6 +366,7 @@ class NumberOrChar(Type):
     """NumberOrChar is used when we need to treat numeric values as numbers, but also allow alphabetic values."""
 
     def __init__(self, value, length, order, path, x):
+        self.default = value
         self.value = value
         self.length = length
         self.order = order
@@ -395,7 +396,8 @@ class NumberOrChar(Type):
     def check_numeric(self, num_call, alpha_call):
         try:
             float(self.value)
-        except ValueError:
+        except (TypeError, ValueError):
+            self.value = self.value or self.default
             return alpha_call()
         else:
             return num_call()

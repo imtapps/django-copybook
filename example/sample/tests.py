@@ -612,3 +612,8 @@ class NumberOrStringFieldTests(test.TestCase):
     def test_default_to_question_marks(self):
         dummy = self.copybook_class(to_copybook=True)
         self.assertEqual('??????????', dummy.field)
+
+    def test_default_to_question_marks_when_none(self):
+        dummy = self.copybook_class(to_copybook=True)
+        dummy.field = None
+        self.assertEqual('??????????', dummy.field)
