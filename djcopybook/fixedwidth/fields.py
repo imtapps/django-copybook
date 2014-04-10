@@ -89,6 +89,26 @@ class StringField(FixedWidthField):
     pass
 
 
+class BooleanField(StringField):
+
+    def __init__(self):
+        super(BooleanField, self).__init__(length=1, default=False)
+
+    def to_python(self, val):
+        if val == 'Y':
+            return True
+        elif val == 'N' or is_blank_string(val):
+            return False
+        return val
+
+    def to_record(self, val=None):
+        if is_blank_string(val) or val is False:
+            return 'N'
+        elif val is True:
+            return 'Y'
+        raise ValueError
+
+
 class NewLineField(FixedWidthField):
 
     def __init__(self):

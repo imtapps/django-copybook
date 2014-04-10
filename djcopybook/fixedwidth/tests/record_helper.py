@@ -29,3 +29,9 @@ class RecordFive(fixedwidth.Record):
     garf = fields.FragmentField(RecordFour)
     new_line = fields.NewLineField()
     threeve = fields.ListField(record=RecordThree, length=2)
+
+
+class RecordSix(fixedwidth.Record):
+    first = fields.BooleanField()
+    second = fields.BooleanField()
+    third = fields.BooleanField()
