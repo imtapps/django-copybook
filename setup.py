@@ -9,7 +9,7 @@ setup(
     url="https://github.com/imtapps/django-copybook",
     long_description=open('README.txt', 'r').read(),
     packages=find_packages(exclude=["example"],),
-    install_requires=open('requirements/dist.txt').read(),
+    install_requires=['six'],
     zip_safe=False,
     classifiers=[
         "Development Status :: 4 - Beta",

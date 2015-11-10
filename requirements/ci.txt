@@ -1,2 +1,3 @@
--r dev.txt
-nosexcover
+
+coverage
+flake8

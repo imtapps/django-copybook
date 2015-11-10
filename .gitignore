@@ -11,3 +11,4 @@ example.db
 coverage.xml
 nosetests.xml
 jenkins_reports/*
+.tox

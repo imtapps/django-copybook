@@ -1,3 +1,0 @@
--r dist.txt
-django_nose
-flake8

@@ -1,4 +1,5 @@
 import datetime
+import six
 
 
 class NOT_PROVIDED(object):
@@ -25,7 +26,7 @@ def float_padding(length, val, decimals=2):
 
 
 def is_blank_string(val):
-    return isinstance(val, basestring) and val.strip() == ''
+    return isinstance(val, six.string_types) and val.strip() == ''
 
 
 class FixedWidthField(object):
@@ -175,7 +176,7 @@ class DateTimeField(FixedWidthField):
         value_dict = {
             type(None): lambda v: None,
             str: self._format_string_date,
-            unicode: self._format_string_date,
+            six.text_type: self._format_string_date,
             datetime.datetime: lambda v: v,
             datetime.date: lambda v: datetime.datetime(v.year, v.month, v.day),
         }
@@ -229,7 +230,7 @@ class FragmentField(FixedWidthField):
         value_dict = {
             type(None): lambda v: self.record_class(),
             str: self.record_class.from_record,
-            unicode: self.record_class.from_record,
+            six.text_type: self.record_class.from_record,
             self.record_class: lambda v: v,
             dict: lambda v: self.record_class(**v),
         }
@@ -278,7 +279,7 @@ class ListField(FixedWidthField):
     def to_python(self, val):
         value_dict = {
             str: self._get_records_from_string,
-            unicode: self._get_records_from_string,
+            six.text_type: self._get_records_from_string,
             list: self._sequence_to_python,
             tuple: self._sequence_to_python,
         }
@@ -308,7 +309,7 @@ class ListField(FixedWidthField):
         max_record_length = len(self.record_class)
         record_length = len(record_val)
         if record_length > (self.length * max_record_length):
-            record_count = record_length / max_record_length
+            record_count = record_length // max_record_length
             msg = "'{attname}' contains {cnt} records but can only have {length}.".format(cnt=record_count,
                                                                                           **self.__dict__)
             raise FieldLengthError(msg)

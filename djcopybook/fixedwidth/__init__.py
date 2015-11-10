@@ -1,6 +1,8 @@
-from django.utils.datastructures import SortedDict as OrderedDict
+
+from collections import OrderedDict
 from copy import deepcopy
 from djcopybook.fixedwidth import fields
+import six
 
 
 def get_declared_fields(bases, attrs):
@@ -16,7 +18,7 @@ def get_declared_fields(bases, attrs):
     # order to preserve the correct order of fields.
     for base in bases[::-1]:
         if hasattr(base, 'base_fields'):
-            fw_fields = base.base_fields.items() + fw_fields
+            fw_fields = list(base.base_fields.items()) + fw_fields
     return OrderedDict(fw_fields)
 
 
@@ -105,14 +107,13 @@ class BaseRecord(object):
         return new_record
 
 
-class Record(BaseRecord):
+class Record(six.with_metaclass(DeclarativeFieldsMetaclass, BaseRecord)):
     """A collection of FixedWidthFields, plus their associated data."""
     # This is a separate class from BaseRecord in order to abstract the way
     # self.fields is specified. This class (Record) is the one that does the
     # fancy metaclass stuff purely for the semantic sugar -- it allows one
     # to define a fixedwidth using declarative syntax.
     # BaseCopybook itself has no way of designating self.fields.
-    __metaclass__ = DeclarativeFieldsMetaclass
 
 
 def get_field_length(f):

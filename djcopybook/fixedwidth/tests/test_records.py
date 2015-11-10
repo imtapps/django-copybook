@@ -9,8 +9,8 @@ class RecordTests(unittest.TestCase):
 
     def test_keeps_list_of_fields_in_order_when_record_is_instantiated(self):
         r = record_helper.RecordOne()
-        self.assertEqual(['field_one', 'field_two'], r.fields.keys())
-        self.assertEqual(['field_one', 'field_two'], r.base_fields.keys())
+        self.assertEqual(['field_one', 'field_two'], list(r.fields.keys()))
+        self.assertEqual(['field_one', 'field_two'], list(r.base_fields.keys()))
 
     def test_sets_auto_truncate_field_on_fields_when_instantiated(self):
         r = record_helper.RecordOne()
@@ -28,8 +28,8 @@ class RecordTests(unittest.TestCase):
 
     def test_record_inheritance_maintains_order(self):
         r = record_helper.RecordTwo()
-        self.assertEqual(['field_one', 'field_two', 'field_three', 'field_four'], r.fields.keys())
-        self.assertEqual(['field_one', 'field_two', 'field_three', 'field_four'], r.base_fields.keys())
+        self.assertEqual(['field_one', 'field_two', 'field_three', 'field_four'], list(r.fields.keys()))
+        self.assertEqual(['field_one', 'field_two', 'field_three', 'field_four'], list(r.base_fields.keys()))
 
     def test_fills_attributes_with_values_given_in_init(self):
         r = record_helper.RecordOne(field_one=10, field_two=5)
