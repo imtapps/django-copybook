@@ -19,10 +19,11 @@ pip install -r requirements/ci.txt
 
 flake8 djcopybook --max-line-length=120 --max-complexity=5 | awk -F\: '{printf "%s:%s: [E]%s%s\n", $1, $2, $3, $4}' > jenkins_reports/flake8.txt
 FLAKE8_EXIT=`cat jenkins_reports/flake8.txt | wc -l`
-rm -rf $VIRTUALENV_NAME
 
 tox
 TEST_EXIT=$?
+
+rm -rf $VIRTUALENV_NAME
 
 let JENKINS_EXIT="$TEST_EXIT +  $FLAKE8_EXIT"
 if [ $JENKINS_EXIT -gt 0 ]; then
