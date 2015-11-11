@@ -1,5 +1,7 @@
+
 import datetime
 import six
+from decimal import Decimal
 
 
 class NOT_PROVIDED(object):
@@ -23,6 +25,17 @@ def int_padding(length, val, direction=">"):
 def float_padding(length, val, decimals=2):
     """Pads zeros to left and right to assure proper length and precision"""
     return '{0:0>{fill}.{precision}f}'.format(float(val), fill=length, precision=decimals)
+
+
+def implied_decimal_padding(length, val, decimals=2):
+    """
+    Pads zeros to left and right to assure proper length and precision
+    If decimals are present, we add 1 to the fill so the length is
+    correct after stripping out the decimal.
+    """
+    fill = length + 1 if decimals else length
+    padded_amount = '{0:0>{fill}.{precision}f}'.format(float(val), fill=fill, precision=decimals)
+    return padded_amount.replace(".", "")
 
 
 def is_blank_string(val):
@@ -107,7 +120,35 @@ class BooleanField(StringField):
             return 'N'
         elif val is True:
             return 'Y'
-        raise ValueError
+        raise ValueError("Value must be Y/N or None. You gave '{}'".format(val))
+
+
+class NullBooleanField(BooleanField):
+    """
+    Like a Boolean Field, but allows None as an option.
+    """
+
+    def to_python(self, val):
+        if not isinstance(val, six.string_types):
+            return val
+
+        vals = {
+            "": None,
+            "Y": True,
+            "N": False,
+        }
+        return vals.get(val.strip(), val)
+
+    def to_record(self, val=None):
+        if not any([isinstance(val, bool), val is None, is_blank_string(val)]):
+            raise ValueError("Value Must be Boolean or None. You gave '{}'".format(val))
+
+        vals = {
+            None: ' ',
+            True: "Y",
+            False: "N",
+        }
+        return vals.get(val, ' ')
 
 
 class NewLineField(FixedWidthField):
@@ -164,6 +205,66 @@ class DecimalField(FixedWidthField):
         if val is None:
             val = 0
         return float_padding(self.length, val, decimals=self.decimals)
+
+
+class ImpliedDecimalField(DecimalField):
+    """
+    Numeric field with implied decimal point
+    Length is total length of field including decimals
+
+    Accord Standard 900, pg. 26
+    """
+
+    def __init__(self, length, default=NOT_PROVIDED, decimals=0):
+        self.decimals = decimals
+        super(ImpliedDecimalField, self).__init__(length, default, decimals=decimals)
+
+    def to_python(self, val):
+        if val is None or is_blank_string(val):
+            return None
+        elif not isinstance(val, six.string_types):
+            return Decimal(str(val))
+
+        d = val[-self.decimals:] if self.decimals else "0"
+        n = "{}.{}".format(val[:self.length-self.decimals], d)
+        return Decimal(n)
+
+    def to_record(self, val):
+        if val is None:
+            val = 0
+        return implied_decimal_padding(self.length, val, decimals=self.decimals)
+
+
+class SignedImpliedDecimalField(ImpliedDecimalField):
+    """
+    Signed Numeric Field with implied decimal point.
+    Length is total length of field including decimals and a sign +/-
+    The sign is always the last byte
+    """
+    def to_python(self, val):
+        if val is None or is_blank_string(val) or self.is_blank_signed_string(val):
+            return None
+        elif not isinstance(val, six.string_types):
+            return Decimal(str(val))
+
+        sign = val[-1]
+        value = val[:-1]
+        val_length = self.length - self.decimals - 1  # remove decimals and the sign byte
+
+        d = value[-self.decimals:] if self.decimals else "0"
+        n = "{}{}.{}".format(sign, value[:val_length], d)
+        return Decimal(n)
+
+    def is_blank_signed_string(self, val):
+        return is_blank_string(str(val).rstrip("+"))
+
+    def to_record(self, val):
+        if val is None:
+            val = 0
+
+        padded = implied_decimal_padding(self.length - 1, abs(val), decimals=self.decimals)
+        sign = "+" if val >= 0 else "-"
+        return padded + sign
 
 
 class DateTimeField(FixedWidthField):
