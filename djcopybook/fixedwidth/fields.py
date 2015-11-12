@@ -128,6 +128,9 @@ class NullBooleanField(BooleanField):
     Like a Boolean Field, but allows None as an option.
     """
 
+    def __init__(self):
+        super(BooleanField, self).__init__(length=1, default=None)
+
     def to_python(self, val):
         if not isinstance(val, six.string_types):
             return val
