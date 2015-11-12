@@ -105,8 +105,8 @@ class StringField(FixedWidthField):
 
 class BooleanField(StringField):
 
-    def __init__(self):
-        super(BooleanField, self).__init__(length=1, default=False)
+    def __init__(self, default=False):
+        super(BooleanField, self).__init__(length=1, default=default)
 
     def to_python(self, val):
         if val == 'Y':
@@ -128,8 +128,8 @@ class NullBooleanField(BooleanField):
     Like a Boolean Field, but allows None as an option.
     """
 
-    def __init__(self):
-        super(BooleanField, self).__init__(length=1, default=None)
+    def __init__(self, default=None):
+        super(BooleanField, self).__init__(length=1, default=default)
 
     def to_python(self, val):
         if not isinstance(val, six.string_types):

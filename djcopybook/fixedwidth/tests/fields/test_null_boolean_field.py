@@ -31,6 +31,13 @@ class NullBooleanFieldTests(TestCase):
         r = SampleRecord()
         self.assertEqual(" ", r.to_record())
 
+    def test_to_record_allows_default_override(self):
+        class SampleRecord(Record):
+            indicator = fields.NullBooleanField(default=True)
+
+        r = SampleRecord()
+        self.assertEqual("Y", r.to_record())
+
     def test_to_record_raises_value_error_when_data_type_invalid(self):
         field = fields.NullBooleanField()
         with self.assertRaises(ValueError) as e:

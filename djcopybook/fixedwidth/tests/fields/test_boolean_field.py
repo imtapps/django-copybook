@@ -1,6 +1,6 @@
 import unittest
 
-from djcopybook.fixedwidth import fields
+from djcopybook.fixedwidth import fields, Record
 from djcopybook.fixedwidth.tests import record_helper
 
 
@@ -31,6 +31,20 @@ class BooleanFieldTests(unittest.TestCase):
         field = fields.BooleanField()
         with self.assertRaises(ValueError):
             field.to_record("X")
+
+    def test_to_record_defaults_to_N(self):
+        class SampleRecord(Record):
+            indicator = fields.BooleanField()
+
+        r = SampleRecord()
+        self.assertEqual("N", r.to_record())
+
+    def test_to_record_allows_default_override(self):
+        class SampleRecord(Record):
+            indicator = fields.BooleanField(default=True)
+
+        r = SampleRecord()
+        self.assertEqual("Y", r.to_record())
 
     def test_from_record_will_return_the_correct_boolean_values(self):
         r = record_helper.RecordSix.from_record("YN ")
