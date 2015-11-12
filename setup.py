@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="django-copybook",
-    version='1.2.0',
+    version='1.2.1',
     author="imtapps",
     author_email="webadmin@imtapps.com",
     description="Convert Objects and Django models to/from fixed format records.",
