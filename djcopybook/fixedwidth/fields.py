@@ -164,7 +164,13 @@ class DateTimeField(FixedWidthField):
     def to_record(self, val):
         if not val:
             return str_padding(self.length, '')
-        return val.strftime(self.format)
+        try:
+            return val.strftime(self.format)
+        except ValueError as e:
+            print(e)
+            if 'is before 1900' in str(e):
+                return self.get_default().strftime(self.format)
+            raise
 
     def _format_string_date(self, val):
         return None if val.strip() == '' else datetime.datetime.strptime(val, self.format)

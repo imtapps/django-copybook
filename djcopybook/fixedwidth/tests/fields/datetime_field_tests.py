@@ -7,10 +7,17 @@ from djcopybook.fixedwidth import fields
 class DateTimeFieldTests(unittest.TestCase):
 
     def setUp(self):
-        self.sut = fields.DateTimeField(length=14, format="%Y%m%d%H%M%S")
+        self.sut = fields.DateTimeField(length=14, default=datetime(2012, 1, 1, 1, 1, 1), format="%Y%m%d%H%M%S")
 
     def test_to_record_returns_formatted_datetime(self):
         self.assertEqual("20120101010101", self.sut.to_record(datetime(2012, 1, 1, 1, 1, 1)))
+
+    def test_to_record_returns_default_formatted_datetime_when_before_1900(self):
+        self.assertEqual("20120101010101", self.sut.to_record(datetime(1899, 1, 1, 1, 1, 1)))
+
+    def test_to_record_raises_exception_when_error_datetime_not_before_1900(self):
+        with self.assertRaises(AttributeError):
+            self.sut.to_record('x')
 
     def test_to_record_returns_empty_string_of_correct_length_when_none(self):
         self.assertEqual("              ", self.sut.to_record(None))
