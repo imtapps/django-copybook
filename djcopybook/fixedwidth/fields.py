@@ -293,7 +293,7 @@ class DateTimeField(FixedWidthField):
             return val.strftime(self.format)
         except ValueError as e:
             if 'is before 1900' in str(e):
-                return self.get_default()
+                return self.get_default().strftime(self.format)
             raise
 
     def _format_string_date(self, val):

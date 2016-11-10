@@ -13,7 +13,7 @@ class DateTimeFieldTests(unittest.TestCase):
         self.assertEqual("20120101010101", self.sut.to_record(datetime(2012, 1, 1, 1, 1, 1)))
 
     def test_to_record_returns_default_formatted_datetime_when_before_1900(self):
-        self.assertEqual("18990101010101", self.sut.to_record(datetime(2012, 1, 1, 1, 1, 1)))
+        self.assertEqual("20120101010101", self.sut.to_record(datetime(1899, 1, 1, 1, 1, 1)))
 
     def test_to_record_raises_exception_when_error_datetime_not_before_1900(self):
         with self.assertRaises(AttributeError):
