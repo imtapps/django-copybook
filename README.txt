@@ -94,7 +94,7 @@ New in version 0.1.6:
         phone_number = fields.FragmentField(record=Phone)
         email = fields.StringField(length=30)
 
-    >>> phone = PhoneNumber(area_code=515, prefix=555, line_number=2222)
+    >>> phone = Phone(area_code=515, prefix=555, line_number=2222)
     >>> contact = Contact(name="Joe", phone_number=phone, email="joe@example.com")
     >>> contact.to_record()
     'Joe                 5155552222joe@example.com               '
