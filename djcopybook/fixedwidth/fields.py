@@ -286,7 +286,7 @@ class DateTimeField(FixedWidthField):
         }
         return value_dict[type(val)](val)
 
-    def to_record(self, val):
+    def to_record(self, val):  # noqa C901
         if not val:
             return str_padding(self.length, '')
         try:
