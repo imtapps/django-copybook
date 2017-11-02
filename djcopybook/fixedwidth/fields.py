@@ -1,4 +1,3 @@
-
 import datetime
 import six
 from decimal import Decimal
@@ -229,7 +228,7 @@ class ImpliedDecimalField(DecimalField):
             return Decimal(str(val))
 
         d = val[-self.decimals:] if self.decimals else "0"
-        n = "{}.{}".format(val[:self.length-self.decimals], d)
+        n = "{}.{}".format(val[:self.length - self.decimals], d)
         return Decimal(n)
 
     def to_record(self, val):
@@ -244,6 +243,7 @@ class SignedImpliedDecimalField(ImpliedDecimalField):
     Length is total length of field including decimals and a sign +/-
     The sign is always the last byte
     """
+
     def to_python(self, val):
         if val is None or is_blank_string(val) or self.is_blank_signed_string(val):
             return None
@@ -346,8 +346,7 @@ class FragmentField(FixedWidthField):
         try:
             return value_dict[type(val)](val)
         except KeyError:
-            msg = "Redefined field must be a string or {record} instance.".format(
-                record=self.record_class.__name__)
+            msg = "Redefined field must be a string or {record} instance.".format(record=self.record_class.__name__)
             raise TypeError(msg)
 
     def to_record(self, val):
@@ -419,6 +418,7 @@ class ListField(FixedWidthField):
         record_length = len(record_val)
         if record_length > (self.length * max_record_length):
             record_count = record_length // max_record_length
-            msg = "'{attname}' contains {cnt} records but can only have {length}.".format(cnt=record_count,
-                                                                                          **self.__dict__)
+            msg = "'{attname}' contains {cnt} records but can only have {length}.".format(
+                cnt=record_count, **self.__dict__
+            )
             raise FieldLengthError(msg)
