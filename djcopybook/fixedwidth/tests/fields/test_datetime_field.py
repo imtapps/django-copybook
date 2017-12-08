@@ -1,3 +1,4 @@
+import six
 from datetime import date, datetime
 import unittest
 
@@ -12,8 +13,11 @@ class DateTimeFieldTests(unittest.TestCase):
     def test_to_record_returns_formatted_datetime(self):
         self.assertEqual("20120101010101", self.sut.to_record(datetime(2012, 1, 1, 1, 1, 1)))
 
-    def test_to_record_returns_default_formatted_datetime_when_before_1900(self):
-        self.assertEqual("20120101010101", self.sut.to_record(datetime(1899, 1, 1, 1, 1, 1)))
+    def test_to_record_returns_default_formatted_datetime_when_before_1900_on_python2(self):
+        if six.PY3:
+            self.assertEqual("18990101010101", self.sut.to_record(datetime(1899, 1, 1, 1, 1, 1)))
+        if six.PY2:
+            self.assertEqual("20120101010101", self.sut.to_record(datetime(1899, 1, 1, 1, 1, 1)))
 
     def test_to_record_raises_exception_when_error_datetime_not_before_1900(self):
         with self.assertRaises(AttributeError):
