@@ -1,6 +1,7 @@
 from datetime import date, datetime
 import unittest
 
+from djcopybook import fixedwidth
 from djcopybook.fixedwidth import fields
 
 
@@ -45,3 +46,36 @@ class DateTimeFieldTests(unittest.TestCase):
 
     def test_to_python_returns_datetime_object_when_unicode(self):
         self.assertEqual(datetime(2012, 1, 1, 1, 1, 1), self.sut.to_python(u"20120101010101"))
+
+    def test_to_record_handles_non_date_str_default(self):
+        class TestRecord(fixedwidth.Record):
+            field_one = fields.DateTimeField(length=10, format="%m/%d/%Y", default="?" * 10)
+        c = TestRecord()
+        self.assertEqual('?' * 10, c.field_one)
+
+    def test_to_record_handles_string_date(self):
+        class TestRecord(fixedwidth.Record):
+            field_one = fields.DateTimeField(length=10, format="%m/%d/%Y")
+        c = TestRecord()
+        c.field_one = "04/05/2010"
+        self.assertEqual(datetime(2010, 4, 5), c.field_one)
+
+    def test_raises_error_if_bad_data_is_put_in_datetimefield(self):
+        class TestRecord(fixedwidth.Record):
+            field_one = fields.DateTimeField(length=10, format="%m/%d/%Y")
+        c = TestRecord()
+        with self.assertRaises(ValueError):
+            c.field_one = 'BADDATA'
+
+    def test_raises_error_if_bad_data_is_put_in_datetimefield_even_with_default(self):
+        class TestRecord(fixedwidth.Record):
+            field_one = fields.DateTimeField(length=10, format="%m/%d/%Y", default='?' * 10)
+        c = TestRecord()
+        with self.assertRaises(ValueError):
+            c.field_one = 'BADDATA'
+
+    def test_to_python_returns_default_even_if_not_convertable_to_datetime(self):
+        field = fields.DateTimeField(length=8, format="%Y%m%d", default='?' * 8)
+        expected_date = '?' * 8
+        python_val = field.to_python(expected_date)
+        self.assertEqual(expected_date, python_val)

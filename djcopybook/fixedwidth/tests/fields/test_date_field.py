@@ -60,6 +60,33 @@ class DateFieldTests(unittest.TestCase):
         c = TestRecord()
         self.assertEqual(date(2001, 8, 1), c.field_one)
 
+    def test_to_record_handles_non_date_str_default(self):
+        class TestRecord(fixedwidth.Record):
+            field_one = fields.DateField(length=10, format="%m/%d/%Y", default="?" * 10)
+        c = TestRecord()
+        c.to_record()
+        self.assertEqual('?' * 10, c.field_one)
+
+    def test_raises_error_if_bad_data_is_put_in_datetimefield(self):
+        class TestRecord(fixedwidth.Record):
+            field_one = fields.DateField(length=10, format="%m/%d/%Y")
+        c = TestRecord()
+        with self.assertRaises(ValueError):
+            c.field_one = 'BADDATA'
+
+    def test_raises_error_if_bad_data_is_put_in_datetimefield_even_with_default(self):
+        class TestRecord(fixedwidth.Record):
+            field_one = fields.DateField(length=10, format="%m/%d/%Y", default='?' * 10)
+        c = TestRecord()
+        with self.assertRaises(ValueError):
+            c.field_one = 'BADDATA'
+
+    def test_to_python_returns_default_even_if_not_convertable_to_datetime(self):
+        field = fields.DateField(length=8, format="%Y%m%d", default='?' * 8)
+        expected_date = '?' * 8
+        python_val = field.to_python(expected_date)
+        self.assertEqual(expected_date, python_val)
+
     def test_datefield_should_allow_date_default_date(self):
         default_date = date(2001, 1, 1)
 
