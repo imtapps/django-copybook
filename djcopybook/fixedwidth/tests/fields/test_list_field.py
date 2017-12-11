@@ -51,6 +51,7 @@ class ListFieldTests(unittest.TestCase):
         self.assertEqual("List field must contain instances of 'RecordOne'.", str(e.exception))
 
     def test_defaults_field_to_empty_list_when_no_records_initially_given(self):
+
         class TestRecord(fixedwidth.Record):
             field_one = fields.ListField(record_helper.RecordOne, length=2)
 
@@ -58,6 +59,7 @@ class ListFieldTests(unittest.TestCase):
         self.assertEqual([], r.field_one)
 
     def test_to_record_returns_string_of_all_records_from_list_field(self):
+
         class TestRecord(fixedwidth.Record):
             list_field = fields.ListField(record_helper.RecordOne, length=2)
 
@@ -97,10 +99,23 @@ class ListFieldTests(unittest.TestCase):
         self.assertEqual("'list_field' contains 3 records but can only have 2.", str(e.exception))
 
     def test_populates_list_field_with_nested_dictionaries(self):
-        input_data = {'threeve': [
-            {'other_field': 'xyz', 'frag': {'field_one': 1, 'field_two': 2}},
-            {'other_field': 'abc', 'frag': {'field_one': 3, 'field_two': 4}}
-        ]}
+        input_data = {
+            'threeve': [
+                {
+                    'other_field': 'xyz',
+                    'frag': {
+                        'field_one': 1,
+                        'field_two': 2
+                    }
+                }, {
+                    'other_field': 'abc',
+                    'frag': {
+                        'field_one': 3,
+                        'field_two': 4
+                    }
+                }
+            ]
+        }
         record = record_helper.RecordFive(**input_data)
         self.assertEqual('xyz', record.threeve[0].other_field)
         self.assertEqual('abc', record.threeve[1].other_field)

@@ -54,6 +54,7 @@ class RecordTests(unittest.TestCase):
         self.assertEqual(12, len(r))
 
     def test_len_on_record_returns_total_amount_with_list_field(self):
+
         class ListRecord(fixedwidth.Record):
             field_one = fields.StringField(length=1)
             field_two = fields.IntegerField(length=2)
@@ -78,6 +79,7 @@ class RecordTests(unittest.TestCase):
         self.assertEqual(500, r.field_two)
 
     def test_from_record_turns_fixed_width_string_to_record_with_list_field(self):
+
         class ListRecord(fixedwidth.Record):
             field_one = fields.StringField(length=1)
             field_two = fields.IntegerField(length=2)

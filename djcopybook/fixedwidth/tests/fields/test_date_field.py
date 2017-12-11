@@ -54,6 +54,7 @@ class DateFieldTests(unittest.TestCase):
             self.assertEqual(None, field.to_python("0001A"))
 
     def test_datefield_should_allow_string_default_date(self):
+
         class TestRecord(fixedwidth.Record):
             field_one = fields.DateField(length=10, format="%m/%d/%Y", default="08/01/2001")
 
@@ -97,6 +98,7 @@ class DateFieldTests(unittest.TestCase):
         self.assertEqual(date(2001, 1, 1), c.field_one)
 
     def test_datefield_should_allow_callable_date(self):
+
         def get_date():
             return date(2000, 1, 1)
 
