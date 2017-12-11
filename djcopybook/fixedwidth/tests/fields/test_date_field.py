@@ -62,22 +62,28 @@ class DateFieldTests(unittest.TestCase):
         self.assertEqual(date(2001, 8, 1), c.field_one)
 
     def test_to_record_handles_non_date_str_default(self):
+
         class TestRecord(fixedwidth.Record):
             field_one = fields.DateField(length=10, format="%m/%d/%Y", default="?" * 10)
+
         c = TestRecord()
         c.to_record()
         self.assertEqual('?' * 10, c.field_one)
 
     def test_raises_error_if_bad_data_is_put_in_datetimefield(self):
+
         class TestRecord(fixedwidth.Record):
             field_one = fields.DateField(length=10, format="%m/%d/%Y")
+
         c = TestRecord()
         with self.assertRaises(ValueError):
             c.field_one = 'BADDATA'
 
     def test_raises_error_if_bad_data_is_put_in_datetimefield_even_with_default(self):
+
         class TestRecord(fixedwidth.Record):
             field_one = fields.DateField(length=10, format="%m/%d/%Y", default='?' * 10)
+
         c = TestRecord()
         with self.assertRaises(ValueError):
             c.field_one = 'BADDATA'
