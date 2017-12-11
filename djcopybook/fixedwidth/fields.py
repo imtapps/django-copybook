@@ -284,17 +284,34 @@ class DateTimeField(FixedWidthField):
             datetime.datetime: lambda v: v,
             datetime.date: lambda v: datetime.datetime(v.year, v.month, v.day),
         }
-        return value_dict[type(val)](val)
+        try:
+            return value_dict[type(val)](val)
+        except ValueError:
+            if val == self.get_default():
+                return self.get_default()
+            raise
 
     def to_record(self, val):  # noqa C901
         if not val:
             return str_padding(self.length, '')
+        elif val == self.get_default() and not isinstance(val, datetime.datetime):
+            if isinstance(self.get_default(), str):
+                return self.get_default()
+        return self._format_datetime_value(val)
+
+    def _format_datetime_value(self, val):
         try:
-            return val.strftime(self.format)
+            return self._python_2_check(val) if six.PY2 else val.strftime(self.format)
         except ValueError as e:
             if 'is before 1900' in str(e):
                 return self.get_default().strftime(self.format)
             raise
+
+    def _python_2_check(self, val):
+        if val.year > 1900:
+            return val.strftime(self.format)
+        else:
+            return self.get_default().strftime(self.format)
 
     def _format_string_date(self, val):
         return None if val.strip() == '' else datetime.datetime.strptime(val, self.format)
