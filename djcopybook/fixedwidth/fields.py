@@ -304,6 +304,8 @@ class DateTimeField(FixedWidthField):
             if six.PY2:
                 if val.year > 1900:
                     return val.strftime(self.format)
+                else:
+                    return self.get_default().strftime(self.format)
             else:
                 return val.strftime(self.format)
         except ValueError as e:
