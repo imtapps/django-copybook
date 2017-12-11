@@ -301,10 +301,7 @@ class DateTimeField(FixedWidthField):
 
     def _format_datetime_value(self, val):
         try:
-            if six.PY2:
-                return self._python_2_check(val)
-            else:
-                return val.strftime(self.format)
+            return self._python_2_check(val) if six.PY2 else val.strftime(self.format)
         except ValueError as e:
             if 'is before 1900' in str(e):
                 return self.get_default().strftime(self.format)
