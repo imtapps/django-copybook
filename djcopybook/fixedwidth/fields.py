@@ -46,9 +46,10 @@ class FixedWidthField(object):
     auto_truncate = ''
     creation_counter = 0
 
-    def __init__(self, length, default=NOT_PROVIDED):
+    def __init__(self, length, default=NOT_PROVIDED, empty_record_value=''):
         self.length = length
         self.default = default
+        self.empty_record_value = empty_record_value
 
         # Increase the creation counter, and save our local copy.
         self.creation_counter = FixedWidthField.creation_counter
@@ -82,7 +83,7 @@ class FixedWidthField(object):
 
     def to_record(self, val):
         if val is None:
-            val = ''
+            val = self.empty_record_value if self.empty_record_value else ''
         return str_padding(self.length, val)
 
     def get_record_value(self, val):
@@ -104,8 +105,8 @@ class StringField(FixedWidthField):
 
 class BooleanField(StringField):
 
-    def __init__(self, default=False):
-        super(BooleanField, self).__init__(length=1, default=default)
+    def __init__(self, default=False, empty_record_value=''):
+        super(BooleanField, self).__init__(length=1, default=default, empty_record_value=empty_record_value)
 
     def to_python(self, val):
         if val == 'Y':
@@ -116,7 +117,7 @@ class BooleanField(StringField):
 
     def to_record(self, val=None):
         if is_blank_string(val) or val is False:
-            return 'N'
+            return self.empty_record_value if self.empty_record_value else 'N'
         elif val is True:
             return 'Y'
         raise ValueError("Value must be Y/N or None. You gave '{}'".format(val))
@@ -127,8 +128,8 @@ class NullBooleanField(BooleanField):
     Like a Boolean Field, but allows None as an option.
     """
 
-    def __init__(self, default=None):
-        super(BooleanField, self).__init__(length=1, default=default)
+    def __init__(self, default=None, empty_record_value=''):
+        super(BooleanField, self).__init__(length=1, default=default, empty_record_value='')
 
     def to_python(self, val):
         if not isinstance(val, six.string_types):
@@ -166,12 +167,12 @@ class NewLineField(FixedWidthField):
 
 class PostalCodeField(FixedWidthField):
 
-    def __init__(self):
-        super(PostalCodeField, self).__init__(length=9)
+    def __init__(self, empty_record_value=''):
+        super(PostalCodeField, self).__init__(length=9, empty_record_value=empty_record_value)
 
     def to_record(self, val):
         if val is None or is_blank_string(val):
-            return str_padding(self.length, " ")
+            return self.empty_record_value if self.empty_record_value else str_padding(self.length, " ")
         try:
             int(val)
             return int_padding(self.length, val, "<")
@@ -181,6 +182,9 @@ class PostalCodeField(FixedWidthField):
 
 class IntegerField(FixedWidthField):
 
+    def __init__(self, length, default=NOT_PROVIDED, empty_record_value=''):
+        super(IntegerField, self).__init__(length, default, empty_record_value)
+
     def to_python(self, val):
         if val is None or is_blank_string(val):
             return None
@@ -188,15 +192,18 @@ class IntegerField(FixedWidthField):
 
     def to_record(self, val):
         if val is None:
-            val = 0
+            if self.empty_record_value:
+                return self.empty_record_value
+            else:
+                val = 0
         return int_padding(self.length, val)
 
 
 class DecimalField(FixedWidthField):
 
-    def __init__(self, length, default=NOT_PROVIDED, decimals=2):
+    def __init__(self, length, default=NOT_PROVIDED, decimals=2, empty_record_value=''):
         self.decimals = decimals
-        super(DecimalField, self).__init__(length, default)
+        super(DecimalField, self).__init__(length, default, empty_record_value)
 
     def to_python(self, val):
         if val is None or is_blank_string(val):
@@ -205,8 +212,16 @@ class DecimalField(FixedWidthField):
 
     def to_record(self, val):
         if val is None:
-            val = 0
+            if self.empty_record_value:
+                return self.empty_record_value
+            else:
+                val = 0
         return float_padding(self.length, val, decimals=self.decimals)
+
+    def _check_record_length(self, record_val):
+        if len(record_val) > self.length:
+            err = "'{attname}' value '{0}' is longer than {length} chars.".format(record_val, **self.__dict__)
+            raise FieldLengthError(err)
 
 
 class ImpliedDecimalField(DecimalField):
@@ -217,9 +232,14 @@ class ImpliedDecimalField(DecimalField):
     Accord Standard 900, pg. 26
     """
 
-    def __init__(self, length, default=NOT_PROVIDED, decimals=0):
+    def __init__(self, length, default=NOT_PROVIDED, decimals=0, empty_record_value=''):
         self.decimals = decimals
-        super(ImpliedDecimalField, self).__init__(length, default, decimals=decimals)
+        super(ImpliedDecimalField, self).__init__(
+            length,
+            default,
+            decimals=decimals,
+            empty_record_value=empty_record_value,
+        )
 
     def to_python(self, val):
         if val is None or is_blank_string(val):
@@ -233,7 +253,10 @@ class ImpliedDecimalField(DecimalField):
 
     def to_record(self, val):
         if val is None:
-            val = 0
+            if self.empty_record_value:
+                return self.empty_record_value
+            else:
+                val = 0
         return implied_decimal_padding(self.length, val, decimals=self.decimals)
 
 
@@ -263,7 +286,10 @@ class SignedImpliedDecimalField(ImpliedDecimalField):
 
     def to_record(self, val):
         if val is None:
-            val = 0
+            if self.empty_record_value:
+                return self.empty_record_value
+            else:
+                val = 0
 
         padded = implied_decimal_padding(self.length - 1, abs(val), decimals=self.decimals)
         sign = "+" if val >= 0 else "-"
@@ -272,9 +298,9 @@ class SignedImpliedDecimalField(ImpliedDecimalField):
 
 class DateTimeField(FixedWidthField):
 
-    def __init__(self, length, default=NOT_PROVIDED, format="%Y-%m-%d"):
+    def __init__(self, length, default=NOT_PROVIDED, format="%Y-%m-%d", empty_record_value=''):
         self.format = format
-        super(DateTimeField, self).__init__(length, default)
+        super(DateTimeField, self).__init__(length, default, empty_record_value)
 
     def to_python(self, val):
         value_dict = {
@@ -288,7 +314,7 @@ class DateTimeField(FixedWidthField):
 
     def to_record(self, val):  # noqa C901
         if not val:
-            return str_padding(self.length, '')
+            return self.empty_record_value if self.empty_record_value else str_padding(self.length, '')
         try:
             return val.strftime(self.format)
         except ValueError as e:

@@ -2,6 +2,7 @@ import six
 from datetime import date, datetime
 import unittest
 
+from djcopybook import fixedwidth
 from djcopybook.fixedwidth import fields
 
 
@@ -49,3 +50,7 @@ class DateTimeFieldTests(unittest.TestCase):
 
     def test_to_python_returns_datetime_object_when_unicode(self):
         self.assertEqual(datetime(2012, 1, 1, 1, 1, 1), self.sut.to_python(u"20120101010101"))
+
+    def test_to_record_returns_empty_record_value_when_value_is_none(self):
+        field = fields.DateTimeField(length=10, format="%m/%d/%Y", empty_record_value="?" * 10)
+        self.assertEqual("?" * 10, field.to_record(None))

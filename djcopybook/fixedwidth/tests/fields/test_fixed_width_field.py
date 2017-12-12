@@ -1,6 +1,7 @@
 import unittest
 
 from djcopybook.fixedwidth import fields
+from djcopybook import fixedwidth
 from djcopybook.fixedwidth.tests.record_helper import RecordOne
 
 
@@ -71,3 +72,7 @@ class FixedWidthFieldTests(unittest.TestCase):
                 field_name = item
         delattr(record, field_name)
         self.assertEqual('AA', record.field_one)
+
+    def test_to_record_returns_empty_record_when_value_is_none(self):
+        field = fields.FixedWidthField(length=3, empty_record_value='?' * 3)
+        self.assertEqual('?' * 3, field.to_record(None))

@@ -26,3 +26,7 @@ class StringFieldTests(unittest.TestCase):
     def test_to_python_returns_empty_string_when_received_all_blanks(self):
         field = fields.StringField(length=5)
         self.assertEqual("", field.to_python("     "))
+
+    def test_to_record_returns_empty_value_record_when_value_is_none(self):
+        field = fields.StringField(length=5, empty_record_value='?' * 5)
+        self.assertEqual("?" * 5, field.to_record(None))

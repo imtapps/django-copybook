@@ -1,5 +1,6 @@
 import unittest
 
+from djcopybook import fixedwidth
 from djcopybook.fixedwidth import fields
 
 
@@ -31,3 +32,7 @@ class DecimalFieldTests(unittest.TestCase):
         field = fields.DecimalField(length=5)
         with self.assertRaises(ValueError):
             self.assertEqual(None, field.to_python("0001A"))
+
+    def test_to_record_returns_empty_record_value_when_value_is_none(self):
+        field = fields.DecimalField(length=10, decimals=2, empty_record_value='?' * 10)
+        self.assertEqual('?' * 10, field.to_record(None))

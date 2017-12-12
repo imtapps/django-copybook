@@ -1,5 +1,6 @@
 from decimal import Decimal
 from unittest import TestCase
+from djcopybook import fixedwidth
 from djcopybook.fixedwidth import fields
 
 
@@ -47,3 +48,7 @@ class ImpliedDecimalFieldTests(TestCase):
     def test_to_python_returns_None_when_value_is_empty_string(self):
         f = fields.ImpliedDecimalField(length=10, decimals=2)
         self.assertEqual(None, f.to_python("          "))
+
+    def test_to_record_returns_empty_record_value_when_value_is_none(self):
+        f = fields.ImpliedDecimalField(length=10, decimals=2, empty_record_value='?' * 10)
+        self.assertEqual('?' * 10, f.to_record(None))

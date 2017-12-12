@@ -1,5 +1,6 @@
 import unittest
 
+from djcopybook import fixedwidth
 from djcopybook.fixedwidth import fields
 
 
@@ -31,3 +32,7 @@ class IntegerFieldTests(unittest.TestCase):
         field = fields.IntegerField(length=5)
         with self.assertRaises(ValueError):
             self.assertEqual(None, field.to_python("0001A"))
+
+    def test_to_record_returns_empty_record_value_when_value_is_none(self):
+        field = fields.IntegerField(length=5, empty_record_value='?' * 5)
+        self.assertEqual('?' * 5, field.to_record(None))

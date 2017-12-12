@@ -30,3 +30,7 @@ class PostalCodeFieldTests(unittest.TestCase):
         python_val = self.field.to_python(50401)
         self.assertEqual("50401", python_val)
         self.assertIsInstance(python_val, str)
+
+    def test_to_record_returns_empty_record_value_when_value_is_none(self):
+        field = fields.PostalCodeField(empty_record_value='?' * 9)
+        self.assertEqual('?' * 9, field.to_record(None))
