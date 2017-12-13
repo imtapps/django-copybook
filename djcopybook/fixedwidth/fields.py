@@ -83,7 +83,7 @@ class FixedWidthField(object):
 
     def to_record(self, val):
         if val is None:
-            val = self.empty_record_value if self.empty_record_value else ''
+            val = self.empty_record_value
         return str_padding(self.length, val)
 
     def get_record_value(self, val):
@@ -105,7 +105,7 @@ class StringField(FixedWidthField):
 
 class BooleanField(StringField):
 
-    def __init__(self, default=False, empty_record_value=''):
+    def __init__(self, default=False, empty_record_value='N'):
         super(BooleanField, self).__init__(length=1, default=default, empty_record_value=empty_record_value)
 
     def to_python(self, val):
@@ -117,7 +117,7 @@ class BooleanField(StringField):
 
     def to_record(self, val=None):
         if is_blank_string(val) or val is False:
-            return self.empty_record_value if self.empty_record_value else 'N'
+            return self.empty_record_value
         elif val is True:
             return 'Y'
         raise ValueError("Value must be Y/N or None. You gave '{}'".format(val))
@@ -182,7 +182,7 @@ class PostalCodeField(FixedWidthField):
 
 class IntegerField(FixedWidthField):
 
-    def __init__(self, length, default=NOT_PROVIDED, empty_record_value=''):
+    def __init__(self, length, default=NOT_PROVIDED, empty_record_value=0):
         super(IntegerField, self).__init__(length, default, empty_record_value)
 
     def to_python(self, val):
@@ -192,16 +192,13 @@ class IntegerField(FixedWidthField):
 
     def to_record(self, val):
         if val is None:
-            if self.empty_record_value:
-                return self.empty_record_value
-            else:
-                val = 0
+            val = self.empty_record_value
         return int_padding(self.length, val)
 
 
 class DecimalField(FixedWidthField):
 
-    def __init__(self, length, default=NOT_PROVIDED, decimals=2, empty_record_value=''):
+    def __init__(self, length, default=NOT_PROVIDED, decimals=2, empty_record_value=0):
         self.decimals = decimals
         super(DecimalField, self).__init__(length, default, empty_record_value)
 
@@ -212,10 +209,7 @@ class DecimalField(FixedWidthField):
 
     def to_record(self, val):
         if val is None:
-            if self.empty_record_value:
-                return self.empty_record_value
-            else:
-                val = 0
+            val = self.empty_record_value
         return float_padding(self.length, val, decimals=self.decimals)
 
     def _check_record_length(self, record_val):
@@ -232,7 +226,7 @@ class ImpliedDecimalField(DecimalField):
     Accord Standard 900, pg. 26
     """
 
-    def __init__(self, length, default=NOT_PROVIDED, decimals=0, empty_record_value=''):
+    def __init__(self, length, default=NOT_PROVIDED, decimals=0, empty_record_value=0):
         self.decimals = decimals
         super(ImpliedDecimalField, self).__init__(
             length,
@@ -253,10 +247,7 @@ class ImpliedDecimalField(DecimalField):
 
     def to_record(self, val):
         if val is None:
-            if self.empty_record_value:
-                return self.empty_record_value
-            else:
-                val = 0
+            val = self.empty_record_value
         return implied_decimal_padding(self.length, val, decimals=self.decimals)
 
 
@@ -286,10 +277,7 @@ class SignedImpliedDecimalField(ImpliedDecimalField):
 
     def to_record(self, val):
         if val is None:
-            if self.empty_record_value:
-                return self.empty_record_value
-            else:
-                val = 0
+            val = self.empty_record_value
 
         padded = implied_decimal_padding(self.length - 1, abs(val), decimals=self.decimals)
         sign = "+" if val >= 0 else "-"
