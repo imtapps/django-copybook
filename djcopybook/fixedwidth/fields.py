@@ -208,12 +208,10 @@ class DecimalField(FixedWidthField):
         return float(val)
 
     def to_record(self, val):
-        if val is None:
-            if self.empty_record_value:
-                return self.empty_record_value
-            else:
-                val = 0
-        return float_padding(self.length, val, decimals=self.decimals)
+        try:
+            return float_padding(self.length, val or self.empty_record_value, decimals=self.decimals)
+        except ValueError:
+            return self.empty_record_value
 
     def _check_record_length(self, record_val):
         if len(record_val) > self.length:
