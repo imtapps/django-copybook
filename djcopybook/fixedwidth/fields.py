@@ -209,7 +209,10 @@ class DecimalField(FixedWidthField):
 
     def to_record(self, val):
         if val is None:
-            val = self.empty_record_value
+            if self.empty_record_value:
+                return self.empty_record_value
+            else:
+                val = 0
         return float_padding(self.length, val, decimals=self.decimals)
 
     def _check_record_length(self, record_val):
@@ -247,7 +250,10 @@ class ImpliedDecimalField(DecimalField):
 
     def to_record(self, val):
         if val is None:
-            val = self.empty_record_value
+            if self.empty_record_value:
+                return self.empty_record_value
+            else:
+                val = 0
         return implied_decimal_padding(self.length, val, decimals=self.decimals)
 
 
@@ -277,8 +283,10 @@ class SignedImpliedDecimalField(ImpliedDecimalField):
 
     def to_record(self, val):
         if val is None:
-            val = self.empty_record_value
-
+            if self.empty_record_value:
+                return self.empty_record_value
+            else:
+                val = 0
         padded = implied_decimal_padding(self.length - 1, abs(val), decimals=self.decimals)
         sign = "+" if val >= 0 else "-"
         return padded + sign
