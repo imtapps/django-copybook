@@ -2,7 +2,6 @@ import six
 from datetime import date, datetime
 import unittest
 
-from djcopybook import fixedwidth
 from djcopybook.fixedwidth import fields
 
 

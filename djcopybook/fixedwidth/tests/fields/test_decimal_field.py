@@ -1,6 +1,5 @@
 import unittest
 
-from djcopybook import fixedwidth
 from djcopybook.fixedwidth import fields
 
 

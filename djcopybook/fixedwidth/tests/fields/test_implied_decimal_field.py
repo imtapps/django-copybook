@@ -1,6 +1,5 @@
 from decimal import Decimal
 from unittest import TestCase
-from djcopybook import fixedwidth
 from djcopybook.fixedwidth import fields
 
 
