@@ -53,3 +53,7 @@ class BooleanFieldTests(unittest.TestCase):
         self.assertEqual(True, r.first)
         self.assertEqual(False, r.second)
         self.assertEqual(False, r.third)
+
+    def test_to_record_returns_empty_record_value_when_value_is_none(self):
+        field = fields.BooleanField(empty_record_value='?')
+        self.assertEqual('?', field.to_record(''))

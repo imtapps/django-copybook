@@ -80,3 +80,11 @@ class DateFieldTests(unittest.TestCase):
 
         c = TestRecord()
         self.assertEqual(date(2000, 1, 1), c.field_one)
+
+    def test_to_record_returns_empty_record_value_when_value_is_none(self):
+
+        class TestRecord(fixedwidth.Record):
+            field_one = fields.DateField(length=10, format="%m/%d/%Y", empty_record_value='?' * 10)
+
+        c = TestRecord()
+        self.assertEqual('?' * 10, c.to_record())

@@ -59,3 +59,7 @@ class SignedImpliedDecimalFieldTests(TestCase):
     def test_to_python_returns_None_when_value_is_empty_string_and_signed(self):
         f = fields.SignedImpliedDecimalField(length=12, decimals=2)
         self.assertEqual(None, f.to_python("           +"))
+
+    def test_to_record_returns_empty_record_value_when_value_is_none(self):
+        f = fields.SignedImpliedDecimalField(length=12, decimals=2, empty_record_value='?' * 12)
+        self.assertEqual('?' * 12, f.to_record(None))
