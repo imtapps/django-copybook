@@ -33,6 +33,7 @@ class BooleanFieldTests(unittest.TestCase):
             field.to_record("X")
 
     def test_to_record_defaults_to_N(self):
+
         class SampleRecord(Record):
             indicator = fields.BooleanField()
 
@@ -40,6 +41,7 @@ class BooleanFieldTests(unittest.TestCase):
         self.assertEqual("N", r.to_record())
 
     def test_to_record_allows_default_override(self):
+
         class SampleRecord(Record):
             indicator = fields.BooleanField(default=True)
 

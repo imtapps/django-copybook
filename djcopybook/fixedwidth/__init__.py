@@ -1,4 +1,3 @@
-
 from collections import OrderedDict
 from copy import deepcopy
 from djcopybook.fixedwidth import fields
@@ -27,6 +26,7 @@ class DeclarativeFieldsMetaclass(type):
     Metaclass that converts Field attributes to a dictionary called
     'base_fields', taking into account parent class 'base_fields' as well.
     """
+
     def __new__(cls, name, bases, attrs):
         attrs['base_fields'] = get_declared_fields(bases, attrs)
         new_class = super(DeclarativeFieldsMetaclass, cls).__new__(cls, name, bases, attrs)

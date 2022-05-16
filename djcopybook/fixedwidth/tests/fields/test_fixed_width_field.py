@@ -34,6 +34,7 @@ class FixedWidthFieldTests(unittest.TestCase):
         self.assertEqual("ABC", field.get_default())
 
     def test_get_default_returns_called_default_when_callable(self):
+
         def get_default():
             return "Default Value"
 

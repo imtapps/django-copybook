@@ -1,4 +1,3 @@
-
 from unittest import TestCase
 from djcopybook.fixedwidth import fields, Record
 
@@ -25,6 +24,7 @@ class NullBooleanFieldTests(TestCase):
         self.assertEqual(' ', field.to_record(None))
 
     def test_to_record_defaults_to_empty(self):
+
         class SampleRecord(Record):
             indicator = fields.NullBooleanField()
 
@@ -32,6 +32,7 @@ class NullBooleanFieldTests(TestCase):
         self.assertEqual(" ", r.to_record())
 
     def test_to_record_allows_default_override(self):
+
         class SampleRecord(Record):
             indicator = fields.NullBooleanField(default=True)
 
